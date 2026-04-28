@@ -23,13 +23,5 @@ export default defineConfig({
         assetFileNames: "assets/[name].[ext]"
       }
     }
-  },
-
-  resolve: {
-    alias: {
-      "@shared": resolve(__dirname, "src/shared"),
-      "@popup":  resolve(__dirname, "src/popup"),
-      "@newtab": resolve(__dirname, "src/newtab")
-    }
   }
 })

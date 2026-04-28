@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
   "name": "MindMirror",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyaJibdiimup3A0jKYtanxx+3okSgr79McfPXQEFRVDI8GyGqedojtSYXvD8YljxLEWQsO2wegLH5t197o1LzP8FQdjl+6TUptTYvaZIlkUUc5idUiOFq84liqDE18gl+2Y8kQ0QLaZmz2M2YVa+BMuEiihr0yGKUuaBtcPerhIPrdXvLmbd2ZTMp4sZLbzxZABJw88HNjFYNYqh91ZyaRNDiAJRw/WYj5xlDIIjkC79xE960ij8g1356ktd53cGHhfBXJQmmfOobAifSETbmEQfF55hUn82rucH+KefXOWS9lZD7CiB0HK/rFWVfuKHr2nL+lb7Zhg/JJA3hrAqREwIDAQAB",
   "version": "1.0.0",
   "description": "Your Digital Second Mind",
   "icons": {
@@ -40,6 +41,8 @@
   ],
 
   "host_permissions": [
+    "http://localhost:3000/*",
+    "http://localhost:8000/*",
     "https://your-node-backend.railway.app/*"
   ],
 
@@ -48,5 +51,13 @@
       "resources": ["newtab.html"],
       "matches": ["<all_urls>"]
     }
-  ]
+  ], 
+
+  "oauth2": {
+    "client_id": "767183110441-vfg3eedoikb6qg2664d5skr92iei2n2l.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  }
 }
