@@ -1,0 +1,1 @@
+console.log("MindMirror background service worker running")

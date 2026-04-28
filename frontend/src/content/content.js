@@ -1,0 +1,1 @@
+console.log("MindMirror content script running on:", window.location.href)
