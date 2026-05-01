@@ -28,6 +28,10 @@ const sessionSchema=new mongoose.Schema({
         type: String,
         required: true
     },
+    timeZone: {
+        type: String,
+        required: true
+    },
     extractedText: {
         type: String,
     }

@@ -16,11 +16,12 @@ export default function App() {
       if (!result.token) return
 
       const response = await getCurrentUserAPI(result.token)
-      console.log(response)
+      // console.log(response)
       dispatch(setUserData(response.user))
 
     } catch (error) {
       console.log(`User not authenticated: ${error}`)
+      await chrome.storage.local.remove("token")
     }
   }
 

@@ -20,8 +20,12 @@ export const getCurrentUserAPI = async (token) => {
 }
 
 export const batchSessionsAPI = async (token, sessions) => {
-    const response = await axiosInstance.post("/api/sessions/batch", { sessions }, {
+    const response = await axiosInstance.post("/api/user/sessions", { sessions }, {
         headers: { Authorization: `Bearer ${token}` }
     })
     return response.data
+}
+
+export const seeAPI=()=>{
+    return {url: import.meta.env.VITE_BACKEND_URL}
 }

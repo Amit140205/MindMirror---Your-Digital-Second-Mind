@@ -27,7 +27,9 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await chrome.storage.local.remove("token")
-    dispatch(clearUserData())
+    await chrome.storage.session.remove("currentSession")
+    await chrome.storage.local.remove("sessionQueue")
+    dispatch(clearUser())
     setDropdownOpen(false)
   }
 
