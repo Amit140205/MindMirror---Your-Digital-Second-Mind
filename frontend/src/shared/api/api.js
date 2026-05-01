@@ -25,7 +25,3 @@ export const batchSessionsAPI = async (token, sessions) => {
     })
     return response.data
 }
-
-export const seeAPI=()=>{
-    return {url: import.meta.env.VITE_BACKEND_URL}
-}
