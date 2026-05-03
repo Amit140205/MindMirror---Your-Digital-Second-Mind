@@ -3,9 +3,6 @@ import json
 from langchain_core.tools import tool
 from pymongo import MongoClient
 from bson import ObjectId
-from dotenv import load_dotenv
-
-load_dotenv()
 
 client = MongoClient(os.getenv("MONGODB_URL"))
 db     = client["MindMirror"]
