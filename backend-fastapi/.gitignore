@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+# Environments
+.venv/
+env/
+venv/
+.env
+14 LangGraph/
+15 MCP/
+16 FastAPI
+setup.txt
+GENAI Notes.pdf
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+
+# Miscellaneous
+.DS_Store
+db.sqlite3
+*.log
+
+# Coverage
+htmlcov/
+.tox/
+.coverage

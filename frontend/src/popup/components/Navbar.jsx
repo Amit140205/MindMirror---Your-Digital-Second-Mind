@@ -29,7 +29,7 @@ export default function Navbar() {
     await chrome.storage.local.remove("token")
     await chrome.storage.session.remove("currentSession")
     await chrome.storage.local.remove("sessionQueue")
-    dispatch(clearUser())
+    dispatch(clearUserData())
     setDropdownOpen(false)
   }
 
