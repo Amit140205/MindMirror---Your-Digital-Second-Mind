@@ -38,3 +38,8 @@ export const chatAPI = async (token, message, timezone) => {
     )
     return response.data
 }
+
+export const checkFastapiHealth = async () => {
+  const response = await axiosFastapiInstance.get("/health")
+  return response.data
+}

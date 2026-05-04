@@ -8,11 +8,14 @@ const IGNORED_PATTERNS = [
   "about:",
   "edge://",
   "brave://",
-];
+]
 
 export function shouldTrack(url) {
-  if (!url) return false;
-  return !IGNORED_PATTERNS.some((pattern) => url.startsWith(pattern));
+  if (!url) return false
+  if (IGNORED_PATTERNS.some((pattern) => url.startsWith(pattern))) return false
+  // never track the MindMirror chat tab itself
+  if (url === chrome.runtime.getURL("newtab.html")) return false
+  return true
 }
 
 export function extractDomain(url) {

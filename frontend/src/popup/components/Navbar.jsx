@@ -1,44 +1,47 @@
-import { useState, useRef, useEffect } from "react"
-import { RiLogoutBoxLine } from "react-icons/ri"
-import { useSelector, useDispatch } from "react-redux"
-import { clearUserData } from "../../shared/store/userSlice"
+import { useState, useRef, useEffect } from "react";
+import { RiLogoutBoxLine } from "react-icons/ri";
+import { useSelector, useDispatch } from "react-redux";
+import { clearUserData, } from "../../shared/store/userSlice";
+import { clearMessages } from "../../shared/store/chatSlice";
 
 export default function Navbar() {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const dropdownRef = useRef(null)
-  const user = useSelector(state => state.user.userData)
-  const dispatch = useDispatch()
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const user = useSelector((state) => state.user.userData);
+  const dispatch = useDispatch();
 
   // close dropdown on outside click
   useEffect(() => {
     function handleClickOutside(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false)
+        setDropdownOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const getInitial = (name) => {
-    if (!name) return "?"
-    return name.charAt(0).toUpperCase()
-  }
+    if (!name) return "?";
+    return name.charAt(0).toUpperCase();
+  };
 
   const handleLogout = async () => {
-    await chrome.storage.local.remove("token")
-    await chrome.storage.session.remove("currentSession")
-    await chrome.storage.local.remove("sessionQueue")
-    dispatch(clearUserData())
-    setDropdownOpen(false)
-  }
+    await chrome.storage.local.remove("token");
+    await chrome.storage.session.remove("currentSession");
+    await chrome.storage.session.remove("chatMessages"); // clear chat
+    await chrome.storage.local.remove("sessionQueue");
+    dispatch(clearUserData());
+    dispatch(clearMessages()); // clear Redux store too
+    setDropdownOpen(false);
+  };
 
   return (
     <nav
       className="flex items-center justify-between px-4 py-3 border-b"
       style={{
         backgroundColor: "var(--bg-surface)",
-        borderColor: "var(--border)"
+        borderColor: "var(--border)",
       }}
     >
       {/* Left — Logo */}
@@ -55,15 +58,14 @@ export default function Navbar() {
       {/* Right — Auth State */}
       {user ? (
         <div className="relative" ref={dropdownRef}>
-
           {/* Avatar Circle */}
           <button
-            onClick={() => setDropdownOpen(prev => !prev)}
+            onClick={() => setDropdownOpen((prev) => !prev)}
             className="w-8 h-8 rounded-full flex items-center justify-center
                        font-semibold text-sm transition-opacity hover:opacity-80"
             style={{
               backgroundColor: "var(--primary)",
-              color: "var(--text-primary)"
+              color: "var(--text-primary)",
             }}
           >
             {getInitial(user.userName)}
@@ -76,7 +78,7 @@ export default function Navbar() {
               style={{
                 backgroundColor: "var(--bg-elevated)",
                 borderColor: "var(--border)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
+                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
               }}
             >
               {/* User Info */}
@@ -113,5 +115,5 @@ export default function Navbar() {
         </div>
       ) : null}
     </nav>
-  )
+  );
 }
