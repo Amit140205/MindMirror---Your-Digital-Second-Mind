@@ -99,11 +99,11 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
   const getModalPosition = () => {
     switch (currentSlide) {
       case 0: // Input search bar at bottom
-        return { bottom: "100px", left: "50%", transform: "translateX(-50%)" }
+        return { bottom: "160px", left: "50%", transform: "translateX(-50%)" }
       case 1: // Back button at top left
         return { top: "80px", left: "24px" }
-      case 2: // Chat interface in center right
-        return { top: "50%", right: "40px", transform: "translateY(-50%)" }
+      case 2: // Chat interface - Moved to left side to avoid overlapping messages on the right
+        return { top: "50%", left: "20px", transform: "translateY(-50%)" }
       case 3: // Analytics button mid left
         return { top: "100px", left: "300px" }
       case 4: // Persistence info (no highlight)
@@ -134,7 +134,7 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
           position: "absolute",
           ...getModalPosition(),
           width: "100%",
-          maxWidth: "480px", // slightly narrower so it fits beside things nicely
+          maxWidth: currentSlide === 2 ? "400px" : "480px", // Narrower modal for chat slide
           background: "var(--bg-surface)",
           border: "1px solid var(--border)",
           borderRadius: "20px",
