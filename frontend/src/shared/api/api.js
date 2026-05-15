@@ -31,9 +31,9 @@ export const getCurrentUserAPI = async (token) => {
 
 
 // chat - backend fastapi
-export const chatAPI = async (token, message, timezone) => {
+export const chatAPI = async (token, message, timeZone) => {
     const response = await axiosFastapiInstance.post("/api/user/chat",
-        { message, timezone },
+        { message, timeZone },
         { headers: { Authorization: `Bearer ${token}` } }
     )
     return response.data

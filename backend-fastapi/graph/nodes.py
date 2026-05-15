@@ -36,15 +36,15 @@ def prompt_node(state: ChatState) -> dict:
     prompt = build_prompt(
         state["user_id"],
         state["user_name"],
-        state["timezone"]
+        state["timeZone"]
     )
     return { "prompt": prompt }
 
 
 async def chat_node(state: ChatState) -> dict:
     system_prompt = state["prompt"]
-    messages      = state["messages"]
-    last_message  = messages[-1]
+    messages = state["messages"]
+    last_message = messages[-1]
 
     # if last message is tool result with real data
     # skip LLM call, pass directly to response_node
@@ -84,7 +84,7 @@ Rules:
 """)
 
     full_messages = [structured_system] + messages
-    response      = await model_structured.ainvoke(full_messages)
+    response = await model_structured.ainvoke(full_messages)
 
     return { "messages": [AIMessage(content=response.model_dump_json())] }
 

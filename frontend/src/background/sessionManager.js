@@ -60,7 +60,7 @@ export async function startNewSession(tabId, url, title) {
     domain: extractDomain(url),
     startTime: Date.now(),
     openedAt: getLocalTime(),
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     extractedText: extractedText,
   });
 }
@@ -86,7 +86,7 @@ export async function endCurrentSession() {
       timeSpent:     timeSpent,
       openedAt:      current.openedAt,
       closedAt:      getLocalTime(),
-      timezone:      current.timezone,
+      timeZone:      current.timeZone,
       extractedText: current.extractedText || ""
     })
   } finally {

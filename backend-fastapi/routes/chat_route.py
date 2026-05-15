@@ -7,7 +7,7 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     message: str
-    timezone: str
+    timeZone: str
 
 @router.post("/chat")
 async def chat(

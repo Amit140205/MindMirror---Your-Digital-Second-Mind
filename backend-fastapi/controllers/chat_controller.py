@@ -14,7 +14,7 @@ async def handle_chat(request, current_user: dict):
     result = await workflow.ainvoke({
         "user_id": current_user["user_id"],
         "user_name": current_user["user_name"],
-        "timezone": request.timezone,
+        "timeZone": request.timeZone,
         "query": request.message,
         "prompt": "",
         "messages": [HumanMessage(content=request.message)]

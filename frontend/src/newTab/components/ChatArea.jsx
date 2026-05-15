@@ -75,8 +75,8 @@ export default function ChatArea({ isTutorialOpen, tutorialSlide }) {
         return;
       }
 
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const response = await chatAPI(token, textToSend, timezone);
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const response = await chatAPI(token, textToSend, timeZone);
 
       const newAiMsg = { role: "ai", data: response };
       dispatch(addMessage(newAiMsg));

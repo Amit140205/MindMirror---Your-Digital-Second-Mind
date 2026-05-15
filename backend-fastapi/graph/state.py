@@ -5,7 +5,7 @@ from langchain_core.messages import BaseMessage
 class ChatState(TypedDict):
     user_id: str
     user_name: str
-    timezone: str
+    timeZone: str
     query: str
     prompt: str
     messages: Annotated[List[BaseMessage], add_messages]
