@@ -115,16 +115,6 @@ body {
   animation: slideFromLeft 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-/* Tutorial Spotlight Highlight */
-.tutorial-highlight {
-  position: relative !important;
-  z-index: 1001 !important;
-  box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.4), 0 0 40px rgba(108, 99, 255, 0.2) !important;
-  border-radius: inherit;
-  transition: all 0.3s ease;
-  pointer-events: none; /* Prevent interacting with highlighted elements during tutorial */
-}
-
 /* Typing Loading Indicator */
 .typing-dot {
   width: 6px;

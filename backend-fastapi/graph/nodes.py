@@ -80,7 +80,9 @@ Rules:
 - Address the user by name
 - Calculate timeSpent in human readable format in your answer
 - Always generate 2-3 relevant follow_up_questions based on what was browsed
-- suggestions should be related URLs worth revisiting, leave null if not relevant
+- suggestions: if the user seems to want to revisit or explore further,
+  provide 2-3 actual URLs from the tool results worth reopening.
+  Otherwise leave null. Never fabricate URLs not present in tool results.
 """)
 
     full_messages = [structured_system] + messages
