@@ -8,7 +8,7 @@ import userRouter from "./routes/user.route.js"
 dotenv.config()
 
 const app=express()
-const port=process.env.PORT || 8000
+const port=process.env.PORT || 3000
 
 app.use(cors({
     origin: "*",  // for development

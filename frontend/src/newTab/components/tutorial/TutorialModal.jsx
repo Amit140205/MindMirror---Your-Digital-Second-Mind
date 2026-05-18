@@ -1,119 +1,228 @@
-import { useState, useEffect } from "react"
-import { HiXMark, HiArrowRight, HiArrowLeft } from "react-icons/hi2"
-import { BsShieldLockFill, BsChatLeftTextFill } from "react-icons/bs"
-import { RiArrowGoBackFill } from "react-icons/ri"
-import { MdHistory, MdBarChart, MdSearch } from "react-icons/md"
+import { useState } from "react";
+import { HiXMark, HiArrowRight, HiArrowLeft } from "react-icons/hi2";
+import { BsShieldLockFill, BsChatLeftTextFill } from "react-icons/bs";
+import { MdBarChart, MdHistory, MdAutoAwesome } from "react-icons/md";
 
-// Slide content definitions
+// Slide Definitions
 
 const slides = [
   {
-    id: 1,
-    icon: <MdSearch size={24} style={{ color: "var(--primary)" }} />,
-    title: "The Search Bar",
-    subtitle: "Your gateway to your digital second mind",
+    id: "how-it-works",
+    icon: <MdAutoAwesome size={24} style={{ color: "var(--primary)" }} />,
+    title: "Welcome to MindMirror",
+    subtitle: "Your personal browsing assistant",
+    highlight: null,
     content: (
-      <div style={{ color: "var(--text-secondary)", fontSize: "13px", lineHeight: "1.6" }}>
-        Type your queries down here. You can ask anything about the websites you've visited, articles you've read, or research you've done. MindMirror will search your encrypted browsing history to find exactly what you're looking for.
+      <div
+        style={{
+          color: "var(--text-secondary)",
+          fontSize: "13px",
+          lineHeight: "1.7",
+        }}
+      >
+        <p>
+          MindMirror runs quietly in the background, tracking the websites you
+          visit.
+        </p>
+        <br />
+        <p>
+          When you're ready, just ask anything — MindMirror searches your
+          personal history and answers in natural language.
+        </p>
+        <br />
+        <p style={{ color: "var(--text-disabled)" }}>
+          No manual logging. No bookmarking. It just works.
+        </p>
       </div>
     ),
   },
   {
-    id: 2,
-    icon: <RiArrowGoBackFill size={22} style={{ color: "var(--accent)" }} />,
-    title: "The Back Button",
-    subtitle: "Return to the extension home anytime",
+    id: "privacy",
+    icon: <BsShieldLockFill size={22} style={{ color: "var(--accent)" }} />,
+    title: "Your Data, Encrypted",
+    subtitle: "Privacy is not an afterthought",
+    highlight: null,
     content: (
-      <div style={{ color: "var(--text-secondary)", fontSize: "13px", lineHeight: "1.6" }}>
-        Clicking this button will close the full-screen Chat Tab and take you back to your regular browsing. You can always reopen the chat by clicking the MindMirror icon in your Chrome toolbar.
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontSize: "13px",
+            lineHeight: "1.7",
+          }}
+        >
+          Everything sensitive — your URLs, page titles, and browsed content —
+          is encrypted with a key unique to you before it ever reaches our
+          database.
+        </p>
+        <div
+          style={{
+            padding: "14px 16px",
+            background: "var(--primary-glow)",
+            border: "1px solid var(--primary)",
+            borderRadius: "10px",
+            fontSize: "12px",
+            color: "var(--text-secondary)",
+            lineHeight: "1.6",
+          }}
+        >
+          <span style={{ color: "var(--primary)", fontWeight: 600 }}>
+            What this means for you:
+          </span>
+          <br />
+          Even if our database were ever breached, your browsing data would be
+          unreadable ciphertext — useless to anyone without your key.
+        </div>
       </div>
     ),
   },
   {
-    id: 3,
+    id: "chat",
     icon: <BsChatLeftTextFill size={20} style={{ color: "var(--primary)" }} />,
-    title: "The Chat Interface",
-    subtitle: "Where the magic happens",
+    title: "Ask Anything",
+    subtitle: "Natural language search over your history",
+    highlight: "chat-input",
     content: (
-      <div style={{ color: "var(--text-secondary)", fontSize: "13px", lineHeight: "1.6" }}>
-        Your messages will appear on the right, and MindMirror's AI responses will appear on the left. The AI will synthesize your past browsing data to give you accurate, personalized answers.
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontSize: "13px",
+            lineHeight: "1.7",
+          }}
+        >
+          Type any question about your browsing in plain English. MindMirror
+          finds the answer from your personal history.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {[
+            "What was I reading about React yesterday?",
+            "Which ecom sites did I visit this week?",
+            "Summarize that AI article I read today",
+          ].map((q, i) => (
+            <div
+              key={i}
+              style={{
+                padding: "8px 14px",
+                background: "var(--bg-elevated)",
+                border: "1px solid var(--border)",
+                borderRadius: "20px",
+                fontSize: "12px",
+                color: "var(--text-secondary)",
+                fontStyle: "italic",
+              }}
+            >
+              "{q}"
+            </div>
+          ))}
+        </div>
       </div>
     ),
   },
   {
-    id: 4,
+    id: "analytics",
     icon: <MdBarChart size={24} style={{ color: "var(--accent)" }} />,
-    title: "Analytics (Coming Soon)",
-    subtitle: "Visualize your browsing habits",
+    title: "Understand Your Habits",
+    subtitle: "Visual insights into your browsing",
+    highlight: "analytics-btn",
     content: (
-      <div style={{ color: "var(--text-secondary)", fontSize: "13px", lineHeight: "1.6" }}>
-        This navigation menu will allow you to switch to the Analytics dashboard, where you can see visualizations of your browsing time, most visited domains, and knowledge graphs.
+      <div
+        style={{
+          color: "var(--text-secondary)",
+          fontSize: "13px",
+          lineHeight: "1.7",
+        }}
+      >
+        <p>
+          Switch to Analytics from the sidebar to see visual breakdowns of your
+          browsing — top domains, peak hours, time spent, and more.
+        </p>
+        <br />
+        <p>
+          Filter by today, this week, this month, or this year. Your data,
+          visualized.
+        </p>
       </div>
     ),
   },
   {
-    id: 5,
+    id: "persistence",
     icon: <MdHistory size={24} style={{ color: "var(--primary)" }} />,
     title: "Your Chats Persist",
-    subtitle: "We remember your session until you close Chrome",
+    subtitle: "We remember your session",
+    highlight: null,
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-        <div style={{ color: "var(--text-secondary)", fontSize: "13px", lineHeight: "1.6" }}>
-          If you close this tab and reopen it later, your conversation will still be here!
-        </div>
-        {/* Warning note */}
-        <div style={{
-          marginTop: "6px",
-          padding: "12px 16px",
-          background: "#FF6B6B11",
-          border: "1px solid #FF6B6B33",
-          borderRadius: "8px",
-          fontSize: "13px",
-          color: "var(--accent-secondary)",
-          lineHeight: "1.5",
-        }}>
-          ⚠️ However, for your privacy, if you fully close the Chrome browser or restart your computer, the conversation will be permanently wiped.
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontSize: "13px",
+            lineHeight: "1.7",
+          }}
+        >
+          Close this tab and reopen it — your conversation will still be here.
+        </p>
+        <div
+          style={{
+            padding: "12px 16px",
+            background: "#FF6B6B11",
+            border: "1px solid #FF6B6B33",
+            borderRadius: "8px",
+            fontSize: "12px",
+            color: "var(--accent-secondary)",
+            lineHeight: "1.6",
+          }}
+        >
+          ⚠️ For your privacy, fully closing the browser wipes the conversation
+          permanently. Your browsing history in the database remains safe and
+          encrypted.
         </div>
       </div>
     ),
   },
-]
+];
 
-// Main Modal Component
+// ── Modal Position Per Highlight ──────────────────────────────────────────────
+// Maps highlight id → modal position style
+// null highlight → centered
 
-export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onClose }) {
-  const [slideClass, setSlideClass] = useState("slide-enter-right")
+function getModalPosition(highlight) {
+  switch (highlight) {
+    case "chat-input":
+      return { bottom: "160px", left: "50%", transform: "translateX(-50%)" };
+    case "analytics-btn":
+      return { top: "100px", left: "260px" };
+    default:
+      return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+  }
+}
 
-  if (!isOpen) return null
+// ── Main Component ────────────────────────────────────────────────────────────
+
+export default function TutorialModal({
+  isOpen,
+  currentSlide,
+  onSlideChange,
+  onClose,
+}) {
+  const [slideClass, setSlideClass] = useState("slide-enter-right");
+
+  if (!isOpen) return null;
+
+  const slide = slides[currentSlide];
+  const isFirst = currentSlide === 0;
+  const isLast = currentSlide === slides.length - 1;
 
   const goToSlide = (direction) => {
-    setSlideClass(direction === "next" ? "slide-enter-right" : "slide-enter-left")
-    onSlideChange(direction === "next" ? currentSlide + 1 : currentSlide - 1)
-  }
+    setSlideClass(
+      direction === "next" ? "slide-enter-right" : "slide-enter-left",
+    );
+    onSlideChange(direction === "next" ? currentSlide + 1 : currentSlide - 1);
+  };
 
-  const slide = slides[currentSlide]
-  const isFirst = currentSlide === 0
-  const isLast = currentSlide === slides.length - 1
-
-  // Determine dynamic positioning to place modal beside the spotlighted component
-  const getModalPosition = () => {
-    switch (currentSlide) {
-      case 0: // Input search bar at bottom
-        return { bottom: "160px", left: "50%", transform: "translateX(-50%)" }
-      case 1: // Back button at top left
-        return { top: "80px", left: "24px" }
-      case 2: // Chat interface - Moved to left side to avoid overlapping messages on the right
-        return { top: "50%", left: "20px", transform: "translateY(-50%)" }
-      case 3: // Analytics button mid left
-        return { top: "100px", left: "300px" }
-      case 4: // Persistence info (no highlight)
-      default:
-        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" }
-    }
-  }
+  const modalPosition = getModalPosition(slide.highlight);
 
   return (
-    /* Backdrop */
     <div
       className="tutorial-backdrop"
       style={{
@@ -121,38 +230,42 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
         inset: 0,
         backgroundColor: "rgba(0, 0, 0, 0.75)",
         backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
         zIndex: 1000,
-        pointerEvents: "auto" // Capture clicks so user can't click background
+        pointerEvents: "auto",
       }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       {/* Modal Card */}
       <div
         className="tutorial-modal"
         style={{
           position: "absolute",
-          ...getModalPosition(),
+          ...modalPosition,
           width: "100%",
-          maxWidth: currentSlide === 2 ? "400px" : "480px", // Narrower modal for chat slide
+          maxWidth: "460px",
           background: "var(--bg-surface)",
           border: "1px solid var(--border)",
           borderRadius: "20px",
-          boxShadow: "0 32px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(108,99,255,0.15)",
+          boxShadow:
+            "0 32px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(108,99,255,0.15)",
           overflow: "hidden",
           fontFamily: "Inter, sans-serif",
-          transition: "all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)", // smooth movement
+          transition: "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
         }}
       >
-        {/* Modal Header */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "16px 20px 12px",
-          borderBottom: "1px solid var(--border)",
-        }}>
-          {/* Slide counter dots */}
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "16px 20px 12px",
+            borderBottom: "1px solid var(--border)",
+          }}
+        >
+          {/* Progress dots */}
           <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
             {slides.map((_, i) => (
               <div
@@ -161,24 +274,25 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
                   width: i === currentSlide ? "20px" : "6px",
                   height: "6px",
                   borderRadius: "3px",
-                  backgroundColor: i === currentSlide ? "var(--primary)" : "var(--border)",
+                  backgroundColor:
+                    i === currentSlide ? "var(--primary)" : "var(--border)",
                   transition: "all 0.3s ease",
                 }}
               />
             ))}
           </div>
 
-          {/* Slide counter text */}
-          <span style={{
-            fontSize: "11px",
-            fontWeight: 500,
-            color: "var(--text-disabled)",
-            letterSpacing: "0.5px",
-          }}>
+          <span
+            style={{
+              fontSize: "11px",
+              fontWeight: 500,
+              color: "var(--text-disabled)",
+              letterSpacing: "0.5px",
+            }}
+          >
             {currentSlide + 1} / {slides.length}
           </span>
 
-          {/* Close */}
           <button
             onClick={onClose}
             style={{
@@ -194,15 +308,15 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
               color: "var(--text-secondary)",
               transition: "all 0.15s ease",
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.backgroundColor = "var(--accent-secondary)"
-              e.currentTarget.style.color = "#fff"
-              e.currentTarget.style.borderColor = "var(--accent-secondary)"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--accent-secondary)";
+              e.currentTarget.style.color = "#fff";
+              e.currentTarget.style.borderColor = "var(--accent-secondary)";
             }}
-            onMouseLeave={e => {
-              e.currentTarget.style.backgroundColor = "var(--bg-elevated)"
-              e.currentTarget.style.color = "var(--text-secondary)"
-              e.currentTarget.style.borderColor = "var(--border)"
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--bg-elevated)";
+              e.currentTarget.style.color = "var(--text-secondary)";
+              e.currentTarget.style.borderColor = "var(--border)";
             }}
           >
             <HiXMark size={14} />
@@ -215,55 +329,67 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
           className={slideClass}
           style={{ padding: "24px 24px 0" }}
         >
-          {/* Slide Title Row */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-            <div style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border)",
+          {/* Title Row */}
+          <div
+            style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}>
+              gap: "12px",
+              marginBottom: "16px",
+            }}
+          >
+            <div
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "12px",
+                background: "var(--bg-elevated)",
+                border: "1px solid var(--border)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
               {slide.icon}
             </div>
             <div>
-              <h2 style={{
-                fontSize: "16px",
-                fontWeight: 700,
-                color: "var(--text-primary)",
-                lineHeight: "1.2",
-              }}>
+              <h2
+                style={{
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "var(--text-primary)",
+                  lineHeight: "1.2",
+                }}
+              >
                 {slide.title}
               </h2>
-              <p style={{
-                fontSize: "12px",
-                color: "var(--text-secondary)",
-                marginTop: "4px",
-              }}>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "var(--text-secondary)",
+                  marginTop: "4px",
+                }}
+              >
                 {slide.subtitle}
               </p>
             </div>
           </div>
 
-          {/* Slide Visual Content */}
-          <div>
-            {slide.content}
-          </div>
+          {/* Content */}
+          {slide.content}
         </div>
 
-        {/* Modal Footer — Navigation */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "20px 24px",
-          marginTop: "8px",
-        }}>
-          {/* Previous */}
+        {/* Footer */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "20px 24px",
+            marginTop: "8px",
+          }}
+        >
           <button
             onClick={() => goToSlide("prev")}
             disabled={isFirst}
@@ -279,16 +405,15 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
               fontSize: "13px",
               fontWeight: 500,
               cursor: isFirst ? "not-allowed" : "pointer",
-              transition: "all 0.15s ease",
-              fontFamily: "Inter, sans-serif",
               opacity: isFirst ? 0.4 : 1,
+              fontFamily: "Inter, sans-serif",
+              transition: "all 0.15s ease",
             }}
           >
             <HiArrowLeft size={14} />
             Previous
           </button>
 
-          {/* Next / Got it */}
           <button
             onClick={isLast ? onClose : () => goToSlide("next")}
             style={{
@@ -303,18 +428,22 @@ export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onC
               fontSize: "13px",
               fontWeight: 600,
               cursor: "pointer",
-              transition: "all 0.15s ease",
               fontFamily: "Inter, sans-serif",
               boxShadow: "0 0 16px var(--primary-glow)",
+              transition: "all 0.15s ease",
             }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--primary-hover)"}
-            onMouseLeave={e => e.currentTarget.style.backgroundColor = "var(--primary)"}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "var(--primary-hover)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "var(--primary)")
+            }
           >
-            {isLast ? "Got it 🎉" : "Next"}
+            {isLast ? "Let's go 🚀" : "Next"}
             {!isLast && <HiArrowRight size={14} />}
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
