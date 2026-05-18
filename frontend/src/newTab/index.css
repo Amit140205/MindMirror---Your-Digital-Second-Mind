@@ -115,7 +115,7 @@ body {
   animation: slideFromLeft 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-/* ─── Tutorial Spotlight Highlight ─── */
+/* Tutorial Spotlight Highlight */
 .tutorial-highlight {
   position: relative !important;
   z-index: 1001 !important;
@@ -125,7 +125,7 @@ body {
   pointer-events: none; /* Prevent interacting with highlighted elements during tutorial */
 }
 
-/* ─── Typing Loading Indicator ─── */
+/* Typing Loading Indicator */
 .typing-dot {
   width: 6px;
   height: 6px;
@@ -139,7 +139,11 @@ body {
   40% { transform: scale(1); opacity: 1; }
 }
 
-/* ─── Navbar back button hover ─── */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Navbar back button hover */
 .back-btn:hover {
   background-color: var(--bg-elevated);
 }

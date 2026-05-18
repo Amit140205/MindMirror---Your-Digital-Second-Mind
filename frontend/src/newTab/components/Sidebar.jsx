@@ -3,9 +3,7 @@ import { MdBarChart } from "react-icons/md";
 
 export default function Sidebar({
   activeView,
-  onViewChange,
-  isTutorialOpen,
-  tutorialSlide,
+  onViewChange
 }) {
   const navItems = [
     {
@@ -50,13 +48,10 @@ export default function Sidebar({
 
       {navItems.map((item) => {
         const isActive = activeView === item.id;
-        const isHighlighted =
-          isTutorialOpen && tutorialSlide === 3 && item.id === "analytics";
 
         return (
           <div
             key={item.id}
-            className={isHighlighted ? "tutorial-highlight" : ""}
             onClick={() => onViewChange(item.id)}
             style={{
               display: "flex",

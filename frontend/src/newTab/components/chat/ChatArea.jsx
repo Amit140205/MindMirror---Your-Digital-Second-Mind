@@ -5,7 +5,7 @@ import { BsArrowUpCircleFill } from "react-icons/bs";
 import { chatAPI, checkFastapiHealth } from "../../../shared/api/api.js";
 import toast from "react-hot-toast";
 
-export default function ChatArea({ isTutorialOpen, tutorialSlide }) {
+export default function ChatArea() {
   const dispatch = useDispatch();
   const messages = useSelector((state) => state.chat.messages);
   const [inputText, setInputText] = useState("");
@@ -101,26 +101,7 @@ export default function ChatArea({ isTutorialOpen, tutorialSlide }) {
     }
   };
 
-  // Tutorial mock messages so we have something to highlight on slide 2
-  const isTutorialMessages =
-    isTutorialOpen && tutorialSlide === 2;
-  const renderMessages = isTutorialMessages
-    ? [
-        { role: "user", text: "What was I searching yesterday about React?" },
-        {
-          role: "ai",
-          data: {
-            answer:
-              "Yesterday, you spent 14 minutes reading about React state management and best practices. You mostly focused on the difference between Context API and Redux.",
-            sources: [
-              { title: "React Documentation", domain: "react.dev", url: "https://react.dev", timeSpent: 420000 },
-              { title: "State Management Guide", domain: "medium.com", url: "https://medium.com", timeSpent: 280000 }
-            ],
-            follow_up_questions: ["Tell me more about Redux", "Show more React articles"],
-          },
-        },
-      ]
-    : messages;
+  const renderMessages = messages;
 
   const showMessages = renderMessages.length > 0 || isLoading;
 
@@ -167,12 +148,9 @@ export default function ChatArea({ isTutorialOpen, tutorialSlide }) {
         ) : (
           /* Active Chat Container */
           <div
-            className={
-              isTutorialOpen && tutorialSlide === 2 ? "tutorial-highlight" : ""
-            }
             style={{
               width: "100%",
-              maxWidth: isTutorialOpen && tutorialSlide === 2 ? "600px" : "800px",
+              maxWidth: "800px",
               display: "flex",
               flexDirection: "column",
               gap: "40px",
@@ -441,9 +419,6 @@ export default function ChatArea({ isTutorialOpen, tutorialSlide }) {
         }}
       >
         <div
-          className={
-            isTutorialOpen && tutorialSlide === 0 ? "tutorial-highlight" : ""
-          }
           style={{
             width: "100%",
             maxWidth: "800px",

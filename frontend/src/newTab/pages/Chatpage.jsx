@@ -54,8 +54,6 @@ export default function ChatPage() {
 
       <Navbar
         onTutorialOpen={handleOpenTutorial}
-        isTutorialOpen={isTutorialOpen}
-        tutorialSlide={tutorialSlide}
       />
 
       <div
@@ -69,8 +67,6 @@ export default function ChatPage() {
         <Sidebar
           activeView={activeView}
           onViewChange={setActiveView}
-          isTutorialOpen={isTutorialOpen}
-          tutorialSlide={tutorialSlide}
         />
 
         {/* Render active view — chat stays mounted to preserve messages */}
@@ -82,10 +78,7 @@ export default function ChatPage() {
             flexDirection: "column",
           }}
         >
-          <ChatArea
-            isTutorialOpen={isTutorialOpen}
-            tutorialSlide={tutorialSlide}
-          />
+          <ChatArea/>
         </div>
 
         <div

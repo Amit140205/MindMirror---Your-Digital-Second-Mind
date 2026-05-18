@@ -3,7 +3,7 @@ import { useSelector } from "react-redux"
 import { HiArrowLeft } from "react-icons/hi2"
 import { HiSparkles } from "react-icons/hi2"
 
-export default function Navbar({ onTutorialOpen, isTutorialOpen, tutorialSlide }) {
+export default function Navbar({ onTutorialOpen }) {
   const user = useSelector(state => state.user.userData)
 
   const getInitial = (name) => {
@@ -35,7 +35,7 @@ export default function Navbar({ onTutorialOpen, isTutorialOpen, tutorialSlide }
       {/* Left — Back Button */}
       <button
         onClick={handleBack}
-        className={`back-btn ${isTutorialOpen && tutorialSlide === 1 ? "tutorial-highlight" : ""}`}
+        className={"back-btn"}
         style={{
           display: "flex",
           alignItems: "center",
