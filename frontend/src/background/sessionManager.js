@@ -26,9 +26,29 @@ export function extractDomain(url) {
   }
 }
 
-function getLocalTime() {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return new Date().toLocaleString("en-IN", { timeZone: timezone });
+function getISOTime() {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const now = new Date()
+  
+  // get local date parts
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year:     "numeric",
+    month:    "2-digit",
+    day:      "2-digit",
+    hour:     "2-digit",
+    minute:   "2-digit",
+    second:   "2-digit",
+    hour12:   false
+  })
+
+  const parts = Object.fromEntries(
+    formatter.formatToParts(now).map(p => [p.type, p.value])
+  )
+
+  // builds "2026-05-18T10:30:00" — local time, no Z suffix
+  // no Z suffix is intentional — Z means UTC, this is local
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`
 }
 
 // Current Session (chrome.storage.session)
@@ -59,7 +79,7 @@ export async function startNewSession(tabId, url, title) {
     title,
     domain: extractDomain(url),
     startTime: Date.now(),
-    openedAt: getLocalTime(),
+    openedAt: getISOTime(),
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     extractedText: extractedText,
   });
@@ -85,7 +105,7 @@ export async function endCurrentSession() {
       domain:        current.domain,
       timeSpent:     timeSpent,
       openedAt:      current.openedAt,
-      closedAt:      getLocalTime(),
+      closedAt:      getISOTime(),
       timeZone:      current.timeZone,
       extractedText: current.extractedText || ""
     })

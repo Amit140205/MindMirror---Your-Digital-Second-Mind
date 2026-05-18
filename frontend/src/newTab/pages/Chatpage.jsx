@@ -1,75 +1,105 @@
-import { useState, useEffect } from "react"
-import ChatNavbar from "../components/ChatNavbar.jsx"
-import TutorialModal from "../components/TutorialModal.jsx"
-import Sidebar from "../components/Sidebar.jsx"
-import ChatArea from "../components/ChatArea.jsx"
-import { Toaster } from "react-hot-toast"
+import { useState, useEffect } from "react";
+import Navbar from "../components/Navbar.jsx";
+import TutorialModal from "../components/tutorial/TutorialModal.jsx";
+import Sidebar from "../components/Sidebar.jsx";
+import ChatArea from "../components/chat/ChatArea.jsx";
+import AnalyticsPage from "./AnalyticsPage.jsx";
+import { Toaster } from "react-hot-toast";
 
 export default function ChatPage() {
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false)
-  const [tutorialSlide, setTutorialSlide] = useState(0)
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [tutorialSlide, setTutorialSlide] = useState(0);
+  const [activeView, setActiveView] = useState("chat"); // "chat" | "analytics"
 
   const handleOpenTutorial = () => {
-    setTutorialSlide(0)
-    setIsTutorialOpen(true)
-  }
+    setTutorialSlide(0);
+    setIsTutorialOpen(true);
+  };
 
   useEffect(() => {
     const checkFirstVisit = async () => {
       try {
-        const result = await chrome.storage.local.get("hasSeenTutorial")
+        const result = await chrome.storage.local.get("hasSeenTutorial");
         if (!result.hasSeenTutorial) {
-          setIsTutorialOpen(true)
-          await chrome.storage.local.set({ hasSeenTutorial: true })
+          setIsTutorialOpen(true);
+          await chrome.storage.local.set({ hasSeenTutorial: true });
         }
       } catch (error) {
-        console.error("Error checking tutorial state:", error)
+        console.error("Error checking tutorial state:", error);
       }
-    }
-
-    checkFirstVisit()
-  }, [])
+    };
+    checkFirstVisit();
+  }, []);
 
   return (
-    <div style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-      backgroundColor: "var(--bg-primary)",
-      overflow: "hidden",
-    }}>
-      <Toaster position="top-center" toastOptions={{
-        style: {
-          background: "var(--bg-elevated)",
-          color: "var(--text-primary)",
-          border: "1px solid var(--border)",
-        }
-      }} />
-      {/* Navbar */}
-      <ChatNavbar
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        backgroundColor: "var(--bg-primary)",
+        overflow: "hidden",
+      }}
+    >
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: "var(--bg-elevated)",
+            color: "var(--text-primary)",
+            border: "1px solid var(--border)",
+          },
+        }}
+      />
+
+      <Navbar
         onTutorialOpen={handleOpenTutorial}
         isTutorialOpen={isTutorialOpen}
         tutorialSlide={tutorialSlide}
       />
 
-      {/* Main Content Layout (Sidebar + Chat Area) */}
-      <div style={{
-        display: "flex",
-        flexDirection: "row",
-        flex: 1,
-        overflow: "hidden"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flex: 1,
+          overflow: "hidden",
+        }}
+      >
         <Sidebar
+          activeView={activeView}
+          onViewChange={setActiveView}
           isTutorialOpen={isTutorialOpen}
           tutorialSlide={tutorialSlide}
         />
-        <ChatArea
-          isTutorialOpen={isTutorialOpen}
-          tutorialSlide={tutorialSlide}
-        />
+
+        {/* Render active view — chat stays mounted to preserve messages */}
+        <div
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            display: activeView === "chat" ? "flex" : "none",
+            flexDirection: "column",
+          }}
+        >
+          <ChatArea
+            isTutorialOpen={isTutorialOpen}
+            tutorialSlide={tutorialSlide}
+          />
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            display: activeView === "analytics" ? "flex" : "none",
+            flexDirection: "column",
+          }}
+        >
+          <AnalyticsPage isVisible={activeView === "analytics"} />
+        </div>
       </div>
 
-      {/* Tutorial Modal */}
       <TutorialModal
         isOpen={isTutorialOpen}
         currentSlide={tutorialSlide}
@@ -77,5 +107,5 @@ export default function ChatPage() {
         onClose={() => setIsTutorialOpen(false)}
       />
     </div>
-  )
+  );
 }

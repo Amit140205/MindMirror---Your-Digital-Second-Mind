@@ -6,12 +6,13 @@ def get_date_context(timezone: str) -> dict:
     now = datetime.now(tz)
     yesterday = now - timedelta(days=1)
 
-    today_storage     = f"{now.day}/{now.month}/{now.year}"
-    yesterday_storage = f"{yesterday.day}/{yesterday.month}/{yesterday.year}"
+    # ISO date portion matches "2026-05-18T..." in openedAt
+    today_storage = now.strftime("%Y-%m-%d")
+    yesterday_storage = yesterday.strftime("%Y-%m-%d")
 
     return {
-        "current_time":      now.strftime("%d %B %Y, %I:%M %p"),
-        "today_storage":     today_storage,
+        "current_time": now.strftime("%d %B %Y, %I:%M %p"),
+        "today_storage": today_storage,
         "yesterday_storage": yesterday_storage
     }
 
@@ -24,13 +25,13 @@ Your ONLY purpose is to help {user_name} recall, understand, and explore their p
 
 IMPORTANT CONTEXT:
 - User's local timezone is: {timezone}
-- All browsing session timestamps are stored in {timezone} local time
 - Current date and time: {dates['current_time']}
-- Today in storage format: {dates['today_storage']}
-- Yesterday in storage format: {dates['yesterday_storage']}
-- Timestamps are stored as D/M/YYYY format (day/month/year)
+- Timestamps are stored as ISO 8601 format (YYYY-MM-DDTHH:MM:SS.sssZ)
+- Today's date prefix: {dates['today_storage']}
+- Yesterday's date prefix: {dates['yesterday_storage']}
 - When user says "today" use date: {dates['today_storage']}
 - When user says "yesterday" use date: {dates['yesterday_storage']}
+- For date filtering, pass only the date portion e.g. "2026-05-18"
 
 STRICT RULES:
 - You MUST call search_browsing_history tool before answering ANY question about browsing

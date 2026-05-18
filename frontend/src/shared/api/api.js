@@ -43,3 +43,11 @@ export const checkFastapiHealth = async () => {
   const response = await axiosFastapiInstance.get("/health")
   return response.data
 }
+
+// analytics - backend node
+export const analyticsAPI = async (token, filter = "month") => {
+    const response = await axiosNodeInstance.get(`/api/user/analytics?filter=${filter}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    })
+    return response.data
+}

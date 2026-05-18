@@ -4,7 +4,7 @@ import { BsShieldLockFill, BsChatLeftTextFill } from "react-icons/bs"
 import { RiArrowGoBackFill } from "react-icons/ri"
 import { MdHistory, MdBarChart, MdSearch } from "react-icons/md"
 
-// ─── Slide content definitions ───────────────────────────────────────────────
+// Slide content definitions
 
 const slides = [
   {
@@ -79,7 +79,7 @@ const slides = [
   },
 ]
 
-// ─── Main Modal Component ─────────────────────────────────────────────────────
+// Main Modal Component
 
 export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onClose }) {
   const [slideClass, setSlideClass] = useState("slide-enter-right")

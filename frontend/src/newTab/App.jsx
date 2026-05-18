@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { setUserData } from "../shared/store/userSlice.js"
 import { getCurrentUserAPI } from "../shared/api/api.js"
-import ChatPage from "./pages/Chatpage.jsx"
+import ChatPage from "./pages/ChatPage.jsx"
 
 export default function App() {
   const dispatch = useDispatch()

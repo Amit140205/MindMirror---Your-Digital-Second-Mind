@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addMessage, setMessages } from "../../shared/store/chatSlice.js";
+import { addMessage, setMessages } from "../../../shared/store/chatSlice.js";
 import { BsArrowUpCircleFill } from "react-icons/bs";
-import { chatAPI, checkFastapiHealth } from "../../shared/api/api.js";
+import { chatAPI, checkFastapiHealth } from "../../../shared/api/api.js";
 import toast from "react-hot-toast";
 
 export default function ChatArea({ isTutorialOpen, tutorialSlide }) {

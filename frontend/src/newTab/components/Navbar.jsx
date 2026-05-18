@@ -3,7 +3,7 @@ import { useSelector } from "react-redux"
 import { HiArrowLeft } from "react-icons/hi2"
 import { HiSparkles } from "react-icons/hi2"
 
-export default function ChatNavbar({ onTutorialOpen, isTutorialOpen, tutorialSlide }) {
+export default function Navbar({ onTutorialOpen, isTutorialOpen, tutorialSlide }) {
   const user = useSelector(state => state.user.userData)
 
   const getInitial = (name) => {
