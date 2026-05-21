@@ -1,211 +1,449 @@
 import { useState } from "react";
 import { HiXMark, HiArrowRight, HiArrowLeft } from "react-icons/hi2";
-import { BsShieldLockFill, BsChatLeftTextFill } from "react-icons/bs";
+import { BsShieldLockFill, BsChatLeftTextFill, BsClockHistory } from "react-icons/bs";
 import { MdBarChart, MdHistory, MdAutoAwesome } from "react-icons/md";
 
-// Slide Definitions
+// ── Slide 1 Illustration — Mini browsing activity feed ────────────────────────
+function HowItWorksIllustration() {
+  const sites = [
+    { domain: "github.com", title: "Exploring a repo...", color: "#6C63FF", time: "4m ago" },
+    { domain: "stackoverflow.com", title: "Looking for answers...", color: "#00D4AA", time: "12m ago" },
+    { domain: "youtube.com", title: "Watching a tutorial...", color: "#FF6B6B", time: "28m ago" },
+  ];
+
+  return (
+    <div style={{
+      background: "var(--bg-primary)",
+      border: "1px solid var(--border)",
+      borderRadius: "12px",
+      padding: "12px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "8px",
+    }}>
+      {/* Header bar */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        paddingBottom: "8px",
+        borderBottom: "1px solid var(--border)",
+      }}>
+        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent)", boxShadow: "0 0 6px var(--accent)" }} />
+        <span style={{ fontSize: "10px", color: "var(--accent)", fontWeight: 600, letterSpacing: "0.5px" }}>
+          TRACKING ACTIVE
+        </span>
+      </div>
+
+      {/* Session rows */}
+      {sites.map((site, i) => (
+        <div key={i} style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "7px 8px",
+          borderRadius: "8px",
+          background: "var(--bg-elevated)",
+          opacity: 1 - i * 0.15,
+        }}>
+          <div style={{
+            width: "28px", height: "28px",
+            borderRadius: "8px",
+            background: site.color + "22",
+            border: `1px solid ${site.color}44`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "12px", flexShrink: 0,
+          }}>
+            🌐
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontSize: "11px", fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {site.domain}
+            </p>
+            <p style={{ fontSize: "10px", color: "var(--text-secondary)", marginTop: "1px" }}>
+              {site.title}
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "4px", flexShrink: 0 }}>
+            <BsClockHistory size={9} style={{ color: "var(--text-disabled)" }} />
+            <span style={{ fontSize: "10px", color: "var(--text-disabled)" }}>{site.time}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Slide 2 Illustration — Encryption visual ──────────────────────────────────
+function EncryptionIllustration() {
+  return (
+    <div style={{
+      background: "var(--bg-primary)",
+      border: "1px solid var(--border)",
+      borderRadius: "12px",
+      padding: "14px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+    }}>
+      {/* Row — plain field */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{
+          padding: "5px 10px",
+          borderRadius: "6px",
+          background: "var(--bg-elevated)",
+          border: "1px solid var(--border)",
+          fontSize: "10px",
+          color: "var(--text-secondary)",
+          fontFamily: "monospace",
+          minWidth: "90px",
+          textAlign: "center",
+        }}>
+          youtube.com
+        </div>
+        <div style={{ fontSize: "10px", color: "var(--text-disabled)", flexShrink: 0 }}>domain →</div>
+        <div style={{
+          padding: "5px 10px",
+          borderRadius: "6px",
+          background: "rgba(0, 212, 170, 0.08)",
+          border: "1px solid rgba(0, 212, 170, 0.3)",
+          fontSize: "10px",
+          color: "var(--accent)",
+          fontFamily: "monospace",
+          flex: 1,
+          textAlign: "center",
+        }}>
+          youtube.com ✓ plain
+        </div>
+      </div>
+
+      {/* Divider with label */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+        <span style={{ fontSize: "9px", color: "var(--text-disabled)", letterSpacing: "0.5px" }}>SENSITIVE FIELDS — ENCRYPTED</span>
+        <div style={{ flex: 1, height: "1px", background: "var(--border)" }} />
+      </div>
+
+      {/* Encrypted rows */}
+      {[
+        { label: "url", raw: "https://youtube.com/watch?v=..." },
+        { label: "title", raw: "React Tutorial - Complete..." },
+      ].map((row, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            padding: "5px 10px",
+            borderRadius: "6px",
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border)",
+            fontSize: "10px",
+            color: "var(--text-secondary)",
+            fontFamily: "monospace",
+            minWidth: "90px",
+            textAlign: "center",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}>
+            {row.raw}
+          </div>
+          <div style={{ fontSize: "16px", flexShrink: 0 }}>🔒</div>
+          <div style={{
+            padding: "5px 10px",
+            borderRadius: "6px",
+            background: "rgba(108, 99, 255, 0.08)",
+            border: "1px solid rgba(108, 99, 255, 0.3)",
+            fontSize: "9px",
+            color: "var(--primary)",
+            fontFamily: "monospace",
+            flex: 1,
+            textAlign: "center",
+            letterSpacing: "0.5px",
+          }}>
+            aGVsbG8gd29ybGQ...
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Slide 3 Illustration — Mini chat UI ───────────────────────────────────────
+function ChatIllustration() {
+  return (
+    <div style={{
+      background: "var(--bg-primary)",
+      border: "1px solid var(--border)",
+      borderRadius: "12px",
+      padding: "12px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+    }}>
+      {/* User message */}
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div style={{
+          background: "var(--primary)",
+          color: "#fff",
+          padding: "8px 12px",
+          borderRadius: "14px 14px 3px 14px",
+          fontSize: "11px",
+          maxWidth: "80%",
+          lineHeight: "1.5",
+        }}>
+          What was I reading about React yesterday?
+        </div>
+      </div>
+
+      {/* AI response */}
+      <div style={{ display: "flex", justifyContent: "flex-start" }}>
+        <div style={{
+          background: "var(--bg-elevated)",
+          borderLeft: "2px solid var(--primary)",
+          borderRadius: "3px 14px 14px 14px",
+          padding: "8px 12px",
+          fontSize: "11px",
+          maxWidth: "85%",
+          lineHeight: "1.5",
+          color: "var(--text-primary)",
+        }}>
+          <span style={{ color: "var(--primary)", fontSize: "9px", marginRight: "6px" }}>✦</span>
+          You spent 24 minutes on the React hooks deep-dive on{" "}
+          <span style={{ color: "var(--primary)" }}>react.dev</span> and watched
+          a tutorial on YouTube...
+        </div>
+      </div>
+
+      {/* Input bar */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "7px 10px",
+        borderRadius: "20px",
+        border: "1px solid var(--primary)",
+        background: "var(--bg-surface)",
+        boxShadow: "0 4px 16px rgba(108, 99, 255, 0.1)",
+      }}>
+        <span style={{ flex: 1, fontSize: "10px", color: "var(--text-disabled)" }}>
+          Ask anything about your browsing...
+        </span>
+        <div style={{
+          width: "22px", height: "22px",
+          borderRadius: "50%",
+          background: "var(--primary)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <HiArrowRight size={10} color="#fff" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Slide 4 Illustration — Mini analytics dashboard ───────────────────────────
+function AnalyticsIllustration() {
+  const bars = [
+    { domain: "github.com", pct: 85, color: "#6C63FF" },
+    { domain: "youtube.com", pct: 62, color: "#00D4AA" },
+    { domain: "stackoverflow.com", pct: 45, color: "#FF6B6B" },
+    { domain: "react.dev", pct: 28, color: "#FFB347" },
+  ];
+
+  return (
+    <div style={{
+      background: "var(--bg-primary)",
+      border: "1px solid var(--border)",
+      borderRadius: "12px",
+      padding: "12px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+    }}>
+      {/* Filter pills */}
+      <div style={{ display: "flex", gap: "6px" }}>
+        {["Today", "Week", "Month", "Year"].map((f, i) => (
+          <div key={f} style={{
+            padding: "3px 10px",
+            borderRadius: "12px",
+            border: "1px solid",
+            borderColor: i === 2 ? "var(--primary)" : "var(--border)",
+            background: i === 2 ? "var(--primary-glow)" : "transparent",
+            color: i === 2 ? "var(--primary)" : "var(--text-disabled)",
+            fontSize: "9px",
+            fontWeight: i === 2 ? 600 : 400,
+          }}>
+            {f}
+          </div>
+        ))}
+      </div>
+
+      {/* Stat chips */}
+      <div style={{ display: "flex", gap: "8px" }}>
+        {[
+          { label: "Sessions", value: "142" },
+          { label: "Time", value: "6h 24m" },
+        ].map(s => (
+          <div key={s.label} style={{
+            flex: 1,
+            padding: "8px 10px",
+            borderRadius: "8px",
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border)",
+          }}>
+            <p style={{ fontSize: "9px", color: "var(--text-disabled)", marginBottom: "3px" }}>{s.label}</p>
+            <p style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-primary)" }}>{s.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Bar chart */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+        {bars.map(b => (
+          <div key={b.domain} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "9px", color: "var(--text-secondary)", width: "80px", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {b.domain}
+            </span>
+            <div style={{ flex: 1, height: "6px", borderRadius: "3px", background: "var(--border)", overflow: "hidden" }}>
+              <div style={{
+                width: `${b.pct}%`,
+                height: "100%",
+                borderRadius: "3px",
+                background: b.color,
+                opacity: 0.85,
+              }} />
+            </div>
+            <span style={{ fontSize: "9px", color: "var(--text-disabled)", width: "24px", textAlign: "right" }}>{b.pct}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Slide 5 Illustration — Session persistence visual ─────────────────────────
+function PersistenceIllustration() {
+  return (
+    <div style={{
+      background: "var(--bg-primary)",
+      border: "1px solid var(--border)",
+      borderRadius: "12px",
+      padding: "14px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+    }}>
+      {/* Timeline */}
+      <div style={{ display: "flex", alignItems: "stretch", gap: "0" }}>
+
+        {/* Step 1 */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
+          <div style={{
+            width: "32px", height: "32px", borderRadius: "50%",
+            background: "rgba(108, 99, 255, 0.15)",
+            border: "1px solid var(--primary)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "14px",
+          }}>💬</div>
+          <div style={{ width: "1px", flex: 1, background: "var(--border)", margin: "4px 0" }} />
+          <p style={{ fontSize: "9px", color: "var(--text-secondary)", textAlign: "center", marginTop: "4px" }}>Chat opened</p>
+        </div>
+
+        <div style={{ width: "32px", height: "1px", background: "var(--border)", alignSelf: "center", marginBottom: "20px" }} />
+
+        {/* Step 2 */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
+          <div style={{
+            width: "32px", height: "32px", borderRadius: "50%",
+            background: "rgba(0, 212, 170, 0.12)",
+            border: "1px solid rgba(0, 212, 170, 0.4)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "14px",
+          }}>🔖</div>
+          <div style={{ width: "1px", flex: 1, background: "var(--border)", margin: "4px 0" }} />
+          <p style={{ fontSize: "9px", color: "var(--text-secondary)", textAlign: "center", marginTop: "4px" }}>Tab closed</p>
+        </div>
+
+        <div style={{ width: "32px", height: "1px", background: "var(--border)", alignSelf: "center", marginBottom: "20px" }} />
+
+        {/* Step 3 */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
+          <div style={{
+            width: "32px", height: "32px", borderRadius: "50%",
+            background: "rgba(108, 99, 255, 0.15)",
+            border: "1px solid var(--primary)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "14px",
+          }}>✨</div>
+          <div style={{ width: "1px", flex: 1, background: "var(--border)", margin: "4px 0" }} />
+          <p style={{ fontSize: "9px", color: "var(--text-secondary)", textAlign: "center", marginTop: "4px" }}>Chat restored</p>
+        </div>
+      </div>
+
+      {/* Warning note */}
+      <div style={{
+        padding: "8px 12px",
+        background: "#FF6B6B0D",
+        border: "1px solid #FF6B6B30",
+        borderRadius: "8px",
+        fontSize: "10px",
+        color: "var(--accent-secondary)",
+        lineHeight: "1.5",
+      }}>
+        ⚠️ Closing the browser fully wipes the chat. Your encrypted browsing history stays safe.
+      </div>
+    </div>
+  );
+}
+
+// ── Slide Definitions ─────────────────────────────────────────────────────────
 
 const slides = [
   {
     id: "how-it-works",
-    icon: <MdAutoAwesome size={24} style={{ color: "var(--primary)" }} />,
+    icon: <MdAutoAwesome size={22} style={{ color: "var(--primary)" }} />,
     title: "Welcome to MindMirror",
     subtitle: "Your personal browsing assistant",
-    highlight: null,
-    content: (
-      <div
-        style={{
-          color: "var(--text-secondary)",
-          fontSize: "13px",
-          lineHeight: "1.7",
-        }}
-      >
-        <p>
-          MindMirror runs quietly in the background, tracking the websites you
-          visit.
-        </p>
-        <br />
-        <p>
-          When you're ready, just ask anything — MindMirror searches your
-          personal history and answers in natural language.
-        </p>
-        <br />
-        <p style={{ color: "var(--text-disabled)" }}>
-          No manual logging. No bookmarking. It just works.
-        </p>
-      </div>
-    ),
+    description: "MindMirror runs quietly in the background. When you're ready, ask anything — it finds the answer from your personal browsing history. No manual logging. No bookmarking.",
+    illustration: <HowItWorksIllustration />,
   },
   {
     id: "privacy",
-    icon: <BsShieldLockFill size={22} style={{ color: "var(--accent)" }} />,
+    icon: <BsShieldLockFill size={20} style={{ color: "var(--accent)" }} />,
     title: "Your Data, Encrypted",
     subtitle: "Privacy is not an afterthought",
-    highlight: null,
-    content: (
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <p
-          style={{
-            color: "var(--text-secondary)",
-            fontSize: "13px",
-            lineHeight: "1.7",
-          }}
-        >
-          Everything sensitive — your URLs, page titles, and browsed content —
-          is encrypted with a key unique to you before it ever reaches our
-          database.
-        </p>
-        <div
-          style={{
-            padding: "14px 16px",
-            background: "var(--primary-glow)",
-            border: "1px solid var(--primary)",
-            borderRadius: "10px",
-            fontSize: "12px",
-            color: "var(--text-secondary)",
-            lineHeight: "1.6",
-          }}
-        >
-          <span style={{ color: "var(--primary)", fontWeight: 600 }}>
-            What this means for you:
-          </span>
-          <br />
-          Even if our database were ever breached, your browsing data would be
-          unreadable ciphertext — useless to anyone without your key.
-        </div>
-      </div>
-    ),
+    description: "Sensitive fields — your URLs, titles, and page content — are encrypted with a key unique to you before reaching our database. Even a breach would expose unreadable ciphertext.",
+    illustration: <EncryptionIllustration />,
   },
   {
     id: "chat",
-    icon: <BsChatLeftTextFill size={20} style={{ color: "var(--primary)" }} />,
+    icon: <BsChatLeftTextFill size={18} style={{ color: "var(--primary)" }} />,
     title: "Ask Anything",
-    subtitle: "Natural language search over your history",
-    highlight: "chat-input",
-    content: (
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        <p
-          style={{
-            color: "var(--text-secondary)",
-            fontSize: "13px",
-            lineHeight: "1.7",
-          }}
-        >
-          Type any question about your browsing in plain English. MindMirror
-          finds the answer from your personal history.
-        </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {[
-            "What was I reading about React yesterday?",
-            "Which ecom sites did I visit this week?",
-            "Summarize that AI article I read today",
-          ].map((q, i) => (
-            <div
-              key={i}
-              style={{
-                padding: "8px 14px",
-                background: "var(--bg-elevated)",
-                border: "1px solid var(--border)",
-                borderRadius: "20px",
-                fontSize: "12px",
-                color: "var(--text-secondary)",
-                fontStyle: "italic",
-              }}
-            >
-              "{q}"
-            </div>
-          ))}
-        </div>
-      </div>
-    ),
+    subtitle: "Natural language over your history",
+    description: "Type any question in plain English. MindMirror searches, decrypts, and answers from your personal browsing — not the web.",
+    illustration: <ChatIllustration />,
   },
   {
     id: "analytics",
-    icon: <MdBarChart size={24} style={{ color: "var(--accent)" }} />,
+    icon: <MdBarChart size={22} style={{ color: "var(--accent)" }} />,
     title: "Understand Your Habits",
     subtitle: "Visual insights into your browsing",
-    highlight: "analytics-btn",
-    content: (
-      <div
-        style={{
-          color: "var(--text-secondary)",
-          fontSize: "13px",
-          lineHeight: "1.7",
-        }}
-      >
-        <p>
-          Switch to Analytics from the sidebar to see visual breakdowns of your
-          browsing — top domains, peak hours, time spent, and more.
-        </p>
-        <br />
-        <p>
-          Filter by today, this week, this month, or this year. Your data,
-          visualized.
-        </p>
-      </div>
-    ),
+    description: "Switch to Analytics from the sidebar. Filter by today, week, month, or year. See top domains, peak hours, time spent, and more.",
+    illustration: <AnalyticsIllustration />,
   },
   {
     id: "persistence",
-    icon: <MdHistory size={24} style={{ color: "var(--primary)" }} />,
+    icon: <MdHistory size={22} style={{ color: "var(--primary)" }} />,
     title: "Your Chats Persist",
     subtitle: "We remember your session",
-    highlight: null,
-    content: (
-      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-        <p
-          style={{
-            color: "var(--text-secondary)",
-            fontSize: "13px",
-            lineHeight: "1.7",
-          }}
-        >
-          Close this tab and reopen it — your conversation will still be here.
-        </p>
-        <div
-          style={{
-            padding: "12px 16px",
-            background: "#FF6B6B11",
-            border: "1px solid #FF6B6B33",
-            borderRadius: "8px",
-            fontSize: "12px",
-            color: "var(--accent-secondary)",
-            lineHeight: "1.6",
-          }}
-        >
-          ⚠️ For your privacy, fully closing the browser wipes the conversation
-          permanently. Your browsing history in the database remains safe and
-          encrypted.
-        </div>
-      </div>
-    ),
+    description: "Close this tab and reopen it — your conversation will still be here. Fully closing the browser wipes the chat for your privacy.",
+    illustration: <PersistenceIllustration />,
   },
 ];
 
-// ── Modal Position Per Highlight ──────────────────────────────────────────────
-// Maps highlight id → modal position style
-// null highlight → centered
-
-function getModalPosition(highlight) {
-  switch (highlight) {
-    case "chat-input":
-      return { bottom: "160px", left: "50%", transform: "translateX(-50%)" };
-    case "analytics-btn":
-      return { top: "100px", left: "260px" };
-    default:
-      return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
-  }
-}
-
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function TutorialModal({
-  isOpen,
-  currentSlide,
-  onSlideChange,
-  onClose,
-}) {
-  const [slideClass, setSlideClass] = useState("slide-enter-right");
+export default function TutorialModal({ isOpen, currentSlide, onSlideChange, onClose }) {
+  const [slideDir, setSlideDir] = useState("right");
 
   if (!isOpen) return null;
 
@@ -214,13 +452,9 @@ export default function TutorialModal({
   const isLast = currentSlide === slides.length - 1;
 
   const goToSlide = (direction) => {
-    setSlideClass(
-      direction === "next" ? "slide-enter-right" : "slide-enter-left",
-    );
+    setSlideDir(direction === "next" ? "right" : "left");
     onSlideChange(direction === "next" ? currentSlide + 1 : currentSlide - 1);
   };
-
-  const modalPosition = getModalPosition(slide.highlight);
 
   return (
     <div
@@ -231,65 +465,59 @@ export default function TutorialModal({
         backgroundColor: "rgba(0, 0, 0, 0.75)",
         backdropFilter: "blur(8px)",
         zIndex: 1000,
-        pointerEvents: "auto",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
       }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      {/* Modal Card */}
+      {/* Modal Card — always centered, max height capped so it never overflows */}
       <div
         className="tutorial-modal"
         style={{
-          position: "absolute",
-          ...modalPosition,
           width: "100%",
-          maxWidth: "460px",
+          maxWidth: "480px",
+          maxHeight: "calc(100vh - 40px)",
           background: "var(--bg-surface)",
           border: "1px solid var(--border)",
           borderRadius: "20px",
-          boxShadow:
-            "0 32px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(108,99,255,0.15)",
+          boxShadow: "0 32px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(108,99,255,0.15)",
           overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
           fontFamily: "Inter, sans-serif",
-          transition: "all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
         }}
       >
         {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "16px 20px 12px",
-            borderBottom: "1px solid var(--border)",
-          }}
-        >
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 20px",
+          borderBottom: "1px solid var(--border)",
+          flexShrink: 0,
+        }}>
           {/* Progress dots */}
           <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
             {slides.map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: i === currentSlide ? "20px" : "6px",
-                  height: "6px",
-                  borderRadius: "3px",
-                  backgroundColor:
-                    i === currentSlide ? "var(--primary)" : "var(--border)",
-                  transition: "all 0.3s ease",
-                }}
+              <div key={i} style={{
+                width: i === currentSlide ? "20px" : "6px",
+                height: "6px",
+                borderRadius: "3px",
+                backgroundColor: i === currentSlide ? "var(--primary)" : "var(--border)",
+                transition: "all 0.3s ease",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setSlideDir(i > currentSlide ? "right" : "left");
+                onSlideChange(i);
+              }}
               />
             ))}
           </div>
 
-          <span
-            style={{
-              fontSize: "11px",
-              fontWeight: 500,
-              color: "var(--text-disabled)",
-              letterSpacing: "0.5px",
-            }}
-          >
+          <span style={{ fontSize: "11px", fontWeight: 500, color: "var(--text-disabled)", letterSpacing: "0.5px" }}>
             {currentSlide + 1} / {slides.length}
           </span>
 
@@ -299,21 +527,18 @@ export default function TutorialModal({
               background: "var(--bg-elevated)",
               border: "1px solid var(--border)",
               borderRadius: "8px",
-              width: "28px",
-              height: "28px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: "28px", height: "28px",
+              display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "pointer",
               color: "var(--text-secondary)",
               transition: "all 0.15s ease",
             }}
-            onMouseEnter={(e) => {
+            onMouseEnter={e => {
               e.currentTarget.style.backgroundColor = "var(--accent-secondary)";
               e.currentTarget.style.color = "#fff";
               e.currentTarget.style.borderColor = "var(--accent-secondary)";
             }}
-            onMouseLeave={(e) => {
+            onMouseLeave={e => {
               e.currentTarget.style.backgroundColor = "var(--bg-elevated)";
               e.currentTarget.style.color = "var(--text-secondary)";
               e.currentTarget.style.borderColor = "var(--border)";
@@ -323,124 +548,104 @@ export default function TutorialModal({
           </button>
         </div>
 
-        {/* Slide Body */}
+        {/* Scrollable Body */}
         <div
           key={currentSlide}
-          className={slideClass}
-          style={{ padding: "24px 24px 0" }}
+          className={slideDir === "right" ? "slide-enter-right" : "slide-enter-left"}
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "20px 24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "14px",
+          }}
         >
           {/* Title Row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "16px",
-            }}
-          >
-            <div
-              style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "12px",
-                background: "var(--bg-elevated)",
-                border: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{
+              width: "42px", height: "42px",
+              borderRadius: "12px",
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}>
               {slide.icon}
             </div>
             <div>
-              <h2
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: "var(--text-primary)",
-                  lineHeight: "1.2",
-                }}
-              >
+              <h2 style={{ fontSize: "16px", fontWeight: 700, color: "var(--text-primary)", lineHeight: "1.2" }}>
                 {slide.title}
               </h2>
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "var(--text-secondary)",
-                  marginTop: "4px",
-                }}
-              >
+              <p style={{ fontSize: "11px", color: "var(--text-secondary)", marginTop: "3px" }}>
                 {slide.subtitle}
               </p>
             </div>
           </div>
 
-          {/* Content */}
-          {slide.content}
+          {/* Description */}
+          <p style={{
+            fontSize: "12px",
+            color: "var(--text-secondary)",
+            lineHeight: "1.7",
+          }}>
+            {slide.description}
+          </p>
+
+          {/* Illustration */}
+          {slide.illustration}
         </div>
 
         {/* Footer */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "20px 24px",
-            marginTop: "8px",
-          }}
-        >
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "14px 24px",
+          borderTop: "1px solid var(--border)",
+          flexShrink: 0,
+        }}>
           <button
             onClick={() => goToSlide("prev")}
             disabled={isFirst}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
+              display: "flex", alignItems: "center", gap: "6px",
               padding: "8px 16px",
               borderRadius: "8px",
               border: "1px solid var(--border)",
               background: "transparent",
               color: isFirst ? "var(--text-disabled)" : "var(--text-secondary)",
-              fontSize: "13px",
-              fontWeight: 500,
+              fontSize: "12px", fontWeight: 500,
               cursor: isFirst ? "not-allowed" : "pointer",
               opacity: isFirst ? 0.4 : 1,
               fontFamily: "Inter, sans-serif",
               transition: "all 0.15s ease",
             }}
           >
-            <HiArrowLeft size={14} />
+            <HiArrowLeft size={13} />
             Previous
           </button>
 
           <button
             onClick={isLast ? onClose : () => goToSlide("next")}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
+              display: "flex", alignItems: "center", gap: "6px",
               padding: "8px 20px",
               borderRadius: "8px",
               border: "none",
               background: "var(--primary)",
               color: "#fff",
-              fontSize: "13px",
-              fontWeight: 600,
+              fontSize: "12px", fontWeight: 600,
               cursor: "pointer",
               fontFamily: "Inter, sans-serif",
               boxShadow: "0 0 16px var(--primary-glow)",
               transition: "all 0.15s ease",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--primary-hover)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "var(--primary)")
-            }
+            onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--primary-hover)"}
+            onMouseLeave={e => e.currentTarget.style.backgroundColor = "var(--primary)"}
           >
             {isLast ? "Let's go 🚀" : "Next"}
-            {!isLast && <HiArrowRight size={14} />}
+            {!isLast && <HiArrowRight size={13} />}
           </button>
         </div>
       </div>
