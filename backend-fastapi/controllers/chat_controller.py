@@ -15,6 +15,8 @@ async def handle_chat(request, current_user: dict):
         "user_id": current_user["user_id"],
         "user_name": current_user["user_name"],
         "timeZone": request.timeZone,
+        "ignoredPatterns": request.ignoredPatterns,
+        "is_ignored": False,
         "query": request.message,
         "prompt": "",
         "messages": [HumanMessage(content=request.message)]

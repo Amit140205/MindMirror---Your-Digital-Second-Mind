@@ -42,3 +42,20 @@ export const saveSessions = async (req, res) => {
     return res.status(500).json({ message: `saveSessions error ${error}` });
   }
 };
+
+export const deleteAllSessions = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const result = await sessionModel.deleteMany({ user: userId });
+
+    return res.status(200).json({
+      message: `${result.deletedCount} sessions deleted successfully`,
+      deletedCount: result.deletedCount
+    });
+
+  } catch (error) {
+    console.log("Error in deleteAllSessions controller:", error);
+    return res.status(500).json({ message: `deleteAllSessions error ${error}` });
+  }
+};

@@ -8,6 +8,7 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     message: str
     timeZone: str
+    ignoredPatterns: list[str] = []
 
 @router.post("/chat")
 async def chat(

@@ -2,7 +2,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 from graph.state import ChatState
-from graph.nodes import prompt_node, chat_node, response_node, route_check
+from graph.nodes import prompt_node, chat_node, response_node, route_check, ignored_check_node
 from graph.tools.search_tool import search_browsing_history
 from graph.tools.tavily_tool import tavily_search
 
@@ -20,12 +20,19 @@ def get_workflow():
 def _build_graph():
     graph = StateGraph(ChatState)
 
+    graph.add_node("ignored_check_node", ignored_check_node)
     graph.add_node("prompt_node", prompt_node)
     graph.add_node("chat_node", chat_node)
     graph.add_node("tools", ToolNode(tools))
     graph.add_node("response_node", response_node)
 
-    graph.add_edge(START, "prompt_node")
+    graph.add_edge(START, "ignored_check_node")
+
+    graph.add_conditional_edges(
+        "ignored_check_node",
+        lambda state: "response_node" if state.get("is_ignored") else "prompt_node"
+    )
+    
     graph.add_edge("prompt_node", "chat_node")
     graph.add_conditional_edges("chat_node", route_check)
     graph.add_edge("tools", "chat_node")

@@ -8,4 +8,6 @@ class ChatState(TypedDict):
     timeZone: str
     query: str
     prompt: str
+    ignoredPatterns: list[str]
+    is_ignored: bool
     messages: Annotated[List[BaseMessage], add_messages]

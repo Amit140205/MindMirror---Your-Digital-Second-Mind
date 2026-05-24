@@ -16,12 +16,25 @@ def get_date_context(timezone: str) -> dict:
         "yesterday_storage": yesterday_storage
     }
 
-def build_prompt(user_id: str, user_name: str, timezone: str) -> str:
+def build_prompt(user_id: str, user_name: str, timezone: str, ignored_patterns: list = []) -> str:
     dates = get_date_context(timezone)
+
+    ignored_section = ""
+    if ignored_patterns:
+        patterns_str = ", ".join(ignored_patterns)
+        ignored_section = f"""
+IGNORED DOMAINS — USER PRIVACY PREFERENCE:
+- {user_name} has chosen not to track: {patterns_str}
+- If the query is related to any of these domains, DO NOT call any tool
+- Respond directly and honestly: "You've chosen not to track [domain]. No data is captured for it."
+- Route directly to response, no tool call needed
+"""
 
     return f"""You are MindMirror, an intelligent personal browsing assistant for {user_name}.
 
 Your ONLY purpose is to help {user_name} recall, understand, and explore their personal browsing history.
+
+{ignored_section}
 
 IMPORTANT CONTEXT:
 - User's local timezone is: {timezone}

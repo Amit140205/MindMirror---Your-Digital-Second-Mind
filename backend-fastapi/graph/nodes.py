@@ -1,5 +1,5 @@
 import json
-from langchain_core.messages import SystemMessage, AIMessage, ToolMessage
+from langchain_core.messages import SystemMessage, AIMessage, ToolMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 from typing import Annotated, Optional, Literal
@@ -7,6 +7,7 @@ from graph.state import ChatState
 from graph.prompt import build_prompt
 from graph.tools.search_tool import search_browsing_history
 from graph.tools.tavily_tool import tavily_search
+
 
 # Output schema
 class Source(BaseModel):
@@ -22,6 +23,10 @@ class MindMirrorResponse(BaseModel):
     suggestions: Annotated[Optional[list[str]], Field(default=None, description="Optional list of related URLs or topics worth revisiting")]
     follow_up_questions: Annotated[Optional[list[str]], Field(default=None, description="2-3 natural follow up questions the user might want to ask next")]
 
+# Ignore patterns schema
+class IgnoredCheckResponse(BaseModel):
+    is_ignored: bool
+
 # Models+Tools
 
 tools = [search_browsing_history, tavily_search]
@@ -32,14 +37,46 @@ model_structured = model.with_structured_output(MindMirrorResponse)
 
 # Nodes
 
+async def ignored_check_node(state: ChatState) -> dict:
+    ignored_patterns = state.get("ignoredPatterns", [])
+
+    if not ignored_patterns:
+        return { "is_ignored": False }
+
+    query = state["query"]
+    user_name = state["user_name"]
+    patterns_str = ", ".join(ignored_patterns)
+
+    check_model = model.with_structured_output(IgnoredCheckResponse)
+
+    result = await check_model.ainvoke([
+        SystemMessage(content=f"""
+IGNORED DOMAINS — USER PRIVACY PREFERENCE:
+- {user_name} has chosen not to track: {patterns_str}
+- If the query is related to any of these domains, return is_ignored: true
+- If the query is unrelated to these domains, return is_ignored: false
+        """),
+        HumanMessage(content=query)
+    ])
+
+    if result.is_ignored:
+        message = f"User is asking about a domain they have chosen not to track. Inform {user_name} politely."
+        return {
+            "is_ignored": True,
+            "messages": [AIMessage(content=message)]
+        }
+
+    return { "is_ignored": False }
+
+
 def prompt_node(state: ChatState) -> dict:
     prompt = build_prompt(
         state["user_id"],
         state["user_name"],
-        state["timeZone"]
+        state["timeZone"],
+        state.get("ignoredPatterns", [])
     )
     return { "prompt": prompt }
-
 
 async def chat_node(state: ChatState) -> dict:
     system_prompt = state["prompt"]
@@ -50,14 +87,16 @@ async def chat_node(state: ChatState) -> dict:
     # skip LLM call, pass directly to response_node
     if isinstance(last_message, ToolMessage):
         tool_content = last_message.content
-        if "No sessions found" not in tool_content:
+        if "No sessions found" not in tool_content and "error" not in tool_content:
             try:
                 results = json.loads(tool_content)
-                if isinstance(results, list):
+                if isinstance(results, list) and len(results) > 0:
                     has_content = any(
-                        r.get("extractedText", "")
+                        r.get("extractedText", {}).get("initial", "").strip() or
+                        any(u.strip() for u in r.get("extractedText", {}).get("updates", []))
                         for r in results
                     )
+
                     if has_content:
                         return { "messages": [AIMessage(content="")] }
             except Exception:
@@ -100,3 +139,4 @@ def route_check(state: ChatState) -> Literal["response_node", "tools"]:
         return "tools"
 
     return "response_node"
+

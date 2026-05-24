@@ -1,56 +1,31 @@
+import mongoose from "mongoose";
 import { sessionModel } from "../models/session.model.js";
 
-// Date Range Helper
-// openedAt is stored as local ISO string "2026-05-18T10:30:00"
-// We build prefix strings to match with $gte / $lte on string comparison
-// ISO strings sort lexicographically correctly so string comparison works
-
-function getDateRange(filter) {
-  const now = new Date();
-
-  // We work with YYYY-MM-DD prefix strings
-  // ISO string comparison works correctly for date filtering
-  // "2026-05-18T..." >= "2026-05-18T00:00:00" is correct
-
-  let startPrefix;
+function getDateRange(filter, timeZone = "UTC") {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const todayStr = formatter.format(new Date());
+  const end = `${todayStr}T23:59:59`; // always end of today
 
   switch (filter) {
-    case "today": {
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, "0");
-      const d = String(now.getDate()).padStart(2, "0");
-      startPrefix = `${y}-${m}-${d}T00:00:00`;
-      break;
-    }
+    case "today":
+      return { start: `${todayStr}T00:00:00`, end };
     case "week": {
-      const weekAgo = new Date(now);
-      weekAgo.setDate(now.getDate() - 6);
-      const y = weekAgo.getFullYear();
-      const m = String(weekAgo.getMonth() + 1).padStart(2, "0");
-      const d = String(weekAgo.getDate()).padStart(2, "0");
-      startPrefix = `${y}-${m}-${d}T00:00:00`;
-      break;
+      const d = new Date();
+      d.setDate(d.getDate() - 6);
+      return { start: `${formatter.format(d)}T00:00:00`, end };
     }
-    case "month": {
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, "0");
-      startPrefix = `${y}-${m}-01T00:00:00`;
-      break;
-    }
-    case "year": {
-      const y = now.getFullYear();
-      startPrefix = `${y}-01-01T00:00:00`;
-      break;
-    }
-    default: {
-      // fallback to this month
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, "0");
-      startPrefix = `${y}-${m}-01T00:00:00`;
-    }
+    case "month":
+      return { start: `${todayStr.slice(0, 7)}-01T00:00:00`, end };
+    case "year":
+      return { start: `${todayStr.slice(0, 4)}-01-01T00:00:00`, end };
+    default:
+      return { start: `${todayStr.slice(0, 7)}-01T00:00:00`, end };
   }
-
-  return startPrefix;
 }
 
 // Analytics Controller
@@ -58,15 +33,18 @@ function getDateRange(filter) {
 export const getAnalytics = async (req, res) => {
   try {
     const userId = req.user._id;
-    const filter = req.query.filter || "month"; // today | week | month | year
-
-    const startPrefix = getDateRange(filter);
+    const filter = req.query.filter || "month";
+    const timeZone = req.query.timeZone || "UTC";
+    const { start: startPrefix, end: endPrefix } = getDateRange(
+      filter,
+      timeZone,
+    );
 
     // Base match — user + date range
     // openedAt stored as "2026-05-18T10:30:00", string comparison works
     const baseMatch = {
-      user: userId,
-      openedAt: { $gte: startPrefix },
+      user: new mongoose.Types.ObjectId(userId),
+      openedAt: { $gte: startPrefix, $lte: endPrefix },
     };
 
     // Run all aggregations in parallel
