@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
-import TutorialModal from "../components/tutorial/TutorialModal.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import ChatArea from "../components/chat/ChatArea.jsx";
 import AnalyticsPage from "./AnalyticsPage.jsx";
 import { Toaster } from "react-hot-toast";
+import SettingsPage from "./SettingsPage.jsx";
+import TutorialModal from "../components/TutorialModal.jsx";
 
 export default function ChatPage() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
@@ -52,9 +53,7 @@ export default function ChatPage() {
         }}
       />
 
-      <Navbar
-        onTutorialOpen={handleOpenTutorial}
-      />
+      <Navbar onTutorialOpen={handleOpenTutorial} />
 
       <div
         style={{
@@ -64,10 +63,7 @@ export default function ChatPage() {
           overflow: "hidden",
         }}
       >
-        <Sidebar
-          activeView={activeView}
-          onViewChange={setActiveView}
-        />
+        <Sidebar activeView={activeView} onViewChange={setActiveView} />
 
         {/* Render active view — chat stays mounted to preserve messages */}
         <div
@@ -78,7 +74,7 @@ export default function ChatPage() {
             flexDirection: "column",
           }}
         >
-          <ChatArea/>
+          <ChatArea />
         </div>
 
         <div
@@ -90,6 +86,17 @@ export default function ChatPage() {
           }}
         >
           <AnalyticsPage isVisible={activeView === "analytics"} />
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            display: activeView === "settings" ? "flex" : "none",
+            flexDirection: "column",
+          }}
+        >
+          <SettingsPage isVisible={activeView === "settings"} />
         </div>
       </div>
 

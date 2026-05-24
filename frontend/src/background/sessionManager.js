@@ -8,14 +8,18 @@ const IGNORED_PATTERNS = [
   "about:",
   "edge://",
   "brave://",
-]
+];
 
-export function shouldTrack(url) {
-  if (!url) return false
-  if (IGNORED_PATTERNS.some((pattern) => url.startsWith(pattern))) return false
-  // never track the MindMirror chat tab itself
-  if (url === chrome.runtime.getURL("newtab.html")) return false
-  return true
+export async function shouldTrack(url) {
+    if (!url) return false
+    if (IGNORED_PATTERNS.some(pattern => url.startsWith(pattern))) return false
+    if (url === chrome.runtime.getURL("newtab.html")) return false
+
+    const result = await chrome.storage.local.get("ignoredPatterns")
+    const userPatterns = result.ignoredPatterns || []
+    if (userPatterns.some(pattern => url.includes(pattern))) return false
+
+    return true
 }
 
 export function extractDomain(url) {
@@ -27,28 +31,25 @@ export function extractDomain(url) {
 }
 
 function getISOTime() {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const now = new Date()
-  
-  // get local date parts
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const now = new Date();
+
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
-    year:     "numeric",
-    month:    "2-digit",
-    day:      "2-digit",
-    hour:     "2-digit",
-    minute:   "2-digit",
-    second:   "2-digit",
-    hour12:   false
-  })
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
 
   const parts = Object.fromEntries(
-    formatter.formatToParts(now).map(p => [p.type, p.value])
-  )
+    formatter.formatToParts(now).map((p) => [p.type, p.value]),
+  );
 
-  // builds "2026-05-18T10:30:00" — local time, no Z suffix
-  // no Z suffix is intentional — Z means UTC, this is local
-  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
 }
 
 // Current Session (chrome.storage.session)
@@ -69,10 +70,9 @@ export async function setCurrentSession(session) {
 // Session Queue (based on tab activity)
 
 export async function startNewSession(tabId, url, title) {
-  const current = await getCurrentSession()
-  const extractedText = (current && current.url === url) 
-    ? current.extractedText 
-    : ""
+  const current = await getCurrentSession();
+  const extractedText =
+    current && current.url === url ? current.extractedText : "";
   await setCurrentSession({
     tabId,
     url,
@@ -81,36 +81,38 @@ export async function startNewSession(tabId, url, title) {
     startTime: Date.now(),
     openedAt: getISOTime(),
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    extractedText: extractedText,
+    // CHANGED: structured format instead of old "[]"
+    extractedText: extractedText || JSON.stringify({ initial: "", updates: [] }),
   });
 }
 
-let isEndingSession = false
+let isEndingSession = false;
 
 export async function endCurrentSession() {
-  if (isEndingSession) return
-  isEndingSession = true
+  if (isEndingSession) return;
+  isEndingSession = true;
 
   try {
-    const current = await getCurrentSession()
-    if (!current) return
+    const current = await getCurrentSession();
+    if (!current) return;
 
-    await setCurrentSession(null)
+    await setCurrentSession(null);
 
-    const timeSpent = Date.now() - current.startTime
+    const timeSpent = Date.now() - current.startTime;
 
     await queueSession({
-      url:           current.url,
-      title:         current.title,
-      domain:        current.domain,
-      timeSpent:     timeSpent,
-      openedAt:      current.openedAt,
-      closedAt:      getISOTime(),
-      timeZone:      current.timeZone,
-      extractedText: current.extractedText || ""
-    })
+      url: current.url,
+      title: current.title,
+      domain: current.domain,
+      timeSpent: timeSpent,
+      openedAt: current.openedAt,
+      closedAt: getISOTime(),
+      timeZone: current.timeZone,
+      // CHANGED: structured format fallback instead of old "[]"
+      extractedText: current.extractedText || JSON.stringify({ initial: "", updates: [] }),
+    });
   } finally {
-    isEndingSession = false
+    isEndingSession = false;
   }
 }
 
@@ -141,40 +143,35 @@ export async function batchFlush() {
 
   if (queue.length === 0) return;
 
-  const tokenResult = await chrome.storage.local.get("token")
-  const token = tokenResult.token
+  const tokenResult = await chrome.storage.local.get("token");
+  const token = tokenResult.token;
 
   if (!token) {
-    console.log("MindMirror: no token, skipping flush")
-    return
+    console.log("MindMirror: no token, skipping flush");
+    return;
   }
 
   console.log(`MindMirror: batch flush → ${queue.length} sessions`);
   console.log("MindMirror: sessions data →", JSON.stringify(queue, null, 2));
 
   try {
-    // not ideal but have to do it because service worker context issue, does not load from .env
-    const BACKEND_URL = "http://localhost:3000"
-
+    const BACKEND_URL = "http://localhost:3000";
     const response = await fetch(`${BACKEND_URL}/api/user/sessions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ sessions: queue })
-    })
-
+      body: JSON.stringify({ sessions: queue }),
+    });
     if (response.ok) {
-      const data = await response.json()
-      console.log(`MindMirror: ${data.message}`)
-      await chrome.storage.local.set({ [QUEUE_KEY]: [] })
+      const data = await response.json();
+      console.log(`MindMirror: ${data.message}`);
+      await chrome.storage.local.set({ [QUEUE_KEY]: [] });
     } else {
-      console.log("MindMirror: flush failed, queue preserved")
+      console.log("MindMirror: flush failed, queue preserved");
     }
   } catch {
-    // keep queue intact on failure
-    // will retry next browser open
     console.log("MindMirror: flush failed, queue preserved");
   }
 }

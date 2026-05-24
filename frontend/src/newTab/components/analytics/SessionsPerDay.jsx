@@ -24,6 +24,8 @@ export default function SessionsPerDay({ data }) {
                     <YAxis tick={{ fill: "#8888AA", fontSize: 10 }} />
                     <Tooltip
                         contentStyle={tooltipStyle}
+                        itemStyle={{ color: "#EEEEF5" }}
+                        labelStyle={{ color: "#8888AA" }}
                         formatter={(v) => [v, "Sessions"]}
                     />
                     <Line

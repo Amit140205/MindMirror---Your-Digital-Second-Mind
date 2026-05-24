@@ -1,5 +1,5 @@
 import { BsChatLeftTextFill } from "react-icons/bs";
-import { MdBarChart } from "react-icons/md";
+import { MdBarChart, MdSettings} from "react-icons/md";
 
 export default function Sidebar({
   activeView,
@@ -17,6 +17,11 @@ export default function Sidebar({
       id: "analytics",
       label: "Analytics",
       icon: <MdBarChart size={18} style={{ color: "var(--accent)" }} />,
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: <MdSettings size={18} style={{ color: "var(--text-secondary)" }} />,
     },
   ];
 

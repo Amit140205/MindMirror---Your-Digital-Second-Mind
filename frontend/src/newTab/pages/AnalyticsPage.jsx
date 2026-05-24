@@ -69,6 +69,7 @@ export default function AnalyticsPage({ isVisible }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [ignoredPatterns, setIgnoredPatterns] = useState([]);
 
   const fetchAnalytics = useCallback(async (selectedFilter) => {
     setLoading(true);
@@ -95,6 +96,12 @@ export default function AnalyticsPage({ isVisible }) {
   useEffect(() => {
     if (isVisible) fetchAnalytics(filter);
   }, [isVisible, filter, fetchAnalytics]);
+
+  useEffect(() => {
+    chrome.storage.local.get("ignoredPatterns").then((result) => {
+      setIgnoredPatterns(result.ignoredPatterns || []);
+    });
+  }, []);
 
   const hasData = data && data.overview.totalSessions > 0;
 
@@ -230,6 +237,7 @@ export default function AnalyticsPage({ isVisible }) {
           <TopDomains
             byTime={data.topDomainsByTime}
             byVisits={data.topDomainsByVisits}
+            ignoredPatterns={ignoredPatterns}
           />
 
           <div
@@ -240,7 +248,7 @@ export default function AnalyticsPage({ isVisible }) {
             }}
           >
             <PeakHours data={data.peakHours} />
-            <DomainBreakdown data={data.domainBreakdown} />
+            <DomainBreakdown data={data.domainBreakdown} ignoredPatterns={ignoredPatterns}/>
           </div>
         </>
       )}

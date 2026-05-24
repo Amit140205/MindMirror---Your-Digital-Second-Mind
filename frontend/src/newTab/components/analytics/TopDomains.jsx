@@ -5,7 +5,11 @@ import {
 import ChartCard from "./ChartCard.jsx"
 import { COLORS, tooltipStyle } from "./ChartConfig.jsx"
 
-function DomainBarChart({ title, data, dataKey, tooltipLabel }) {
+function isIgnored(domain, ignoredPatterns) {
+    return ignoredPatterns.some(p => domain.includes(p.replace("www.", "")))
+}
+
+function DomainBarChart({ title, data, dataKey, tooltipLabel, ignoredPatterns = [] }) {
     if (!data || data.length === 0) return null
 
     return (
@@ -27,20 +31,42 @@ function DomainBarChart({ title, data, dataKey, tooltipLabel }) {
                     />
                     <Tooltip
                         contentStyle={tooltipStyle}
-                        formatter={(v) => [v, tooltipLabel]}
+                        itemStyle={{ color: "#EEEEF5" }}
+                        labelStyle={{ color: "#8888AA" }}
+                        formatter={(v, n, props) => {
+                            const domain = props.payload?.domain || ""
+                            const ignored = isIgnored(domain, ignoredPatterns)
+                            return [v, ignored ? `${tooltipLabel} (not tracked)` : tooltipLabel]
+                        }}
                     />
                     <Bar dataKey={dataKey} radius={[0, 4, 4, 0]}>
-                        {data.map((_, i) => (
-                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        {data.map((entry, i) => (
+                            <Cell
+                                key={i}
+                                fill={isIgnored(entry.domain, ignoredPatterns) ? "#44445A" : COLORS[i % COLORS.length]}
+                                opacity={isIgnored(entry.domain, ignoredPatterns) ? 0.5 : 1}
+                            />
                         ))}
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
+
+            {/* legend note if any ignored domain present */}
+            {data.some(entry => isIgnored(entry.domain, ignoredPatterns)) && (
+                <p style={{
+                    fontSize: "10px",
+                    color: "var(--text-disabled)",
+                    marginTop: "8px",
+                    textAlign: "center"
+                }}>
+                    ⬛ Greyed domains were tracked before you disabled tracking for them
+                </p>
+            )}
         </ChartCard>
     )
 }
 
-export default function TopDomains({ byTime, byVisits }) {
+export default function TopDomains({ byTime, byVisits, ignoredPatterns = [] }) {
     if ((!byTime || byTime.length === 0) && (!byVisits || byVisits.length === 0)) return null
 
     return (
@@ -50,12 +76,14 @@ export default function TopDomains({ byTime, byVisits }) {
                 data={byTime}
                 dataKey="minutes"
                 tooltipLabel="Minutes"
+                ignoredPatterns={ignoredPatterns}
             />
             <DomainBarChart
                 title="Top Domains by Visits"
                 data={byVisits}
                 dataKey="visits"
                 tooltipLabel="Visits"
+                ignoredPatterns={ignoredPatterns}
             />
         </div>
     )

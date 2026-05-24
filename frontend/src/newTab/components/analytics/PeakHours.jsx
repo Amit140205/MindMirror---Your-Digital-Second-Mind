@@ -24,6 +24,8 @@ export default function PeakHours({ data }) {
                     <YAxis tick={{ fill: "#8888AA", fontSize: 10 }} />
                     <Tooltip
                         contentStyle={tooltipStyle}
+                        itemStyle={{ color: "#EEEEF5" }}
+                        labelStyle={{ color: "#8888AA" }}
                         formatter={(v, n) => [v, n === "sessions" ? "Sessions" : "Minutes"]}
                         labelFormatter={h => `${h}:00 - ${h}:59`}
                     />

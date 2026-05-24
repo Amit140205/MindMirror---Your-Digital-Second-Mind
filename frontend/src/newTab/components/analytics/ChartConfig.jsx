@@ -17,6 +17,7 @@ export const tooltipStyle = {
   borderRadius: "8px",
   color: "#EEEEF5",
   fontSize: "12px",
+  fontFamily: "Inter, sans-serif",
 };
 
 // Pie chart inner label — shows percentage, hides slices under 5%

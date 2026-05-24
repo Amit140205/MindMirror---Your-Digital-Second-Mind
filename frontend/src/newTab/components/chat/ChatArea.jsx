@@ -65,7 +65,11 @@ export default function ChatArea() {
       }
 
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const response = await chatAPI(token, textToSend, timeZone);
+
+      const patternResult = await chrome.storage.local.get("ignoredPatterns")
+      const ignoredPatterns = patternResult.ignoredPatterns || []
+
+      const response = await chatAPI(token, textToSend, timeZone, ignoredPatterns)
 
       dispatch(addMessage({ role: "ai", data: response }));
     } catch (error) {
