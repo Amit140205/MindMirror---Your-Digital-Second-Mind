@@ -13,15 +13,12 @@ const userSlice=createSlice({
         clearUserData: (state) => {
             state.userData = null
         },
-        markPatternsDirty: (state) => {
-            state.ignoredPatternsDirty = true
-        },
-        markPatternsClean: (state) => {
-            state.ignoredPatternsDirty = false
+        setIgnoredPatternsDirty: (state, action) => {
+            state.ignoredPatternsDirty = action.payload
         }
     }
 })
 
-export const {setUserData, clearUserData, markPatternsDirty, markPatternsClean}=userSlice.actions
+export const {setUserData, clearUserData, setIgnoredPatternsDirty}=userSlice.actions
 
 export default userSlice.reducer

@@ -7,10 +7,10 @@ import { Toaster } from "react-hot-toast";
 import SettingsPage from "./SettingsPage.jsx";
 import TutorialModal from "../components/TutorialModal.jsx";
 
-export default function ChatPage() {
+export default function ChatPage({ initialView = "chat" }) {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [tutorialSlide, setTutorialSlide] = useState(0);
-  const [activeView, setActiveView] = useState("chat"); // "chat" | "analytics"
+  const [activeView, setActiveView] = useState(initialView); 
 
   const handleOpenTutorial = () => {
     setTutorialSlide(0);

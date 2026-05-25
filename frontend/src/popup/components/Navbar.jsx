@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { RiLogoutBoxLine } from "react-icons/ri";
 import { useSelector, useDispatch } from "react-redux";
-import { clearUserData, } from "../../shared/store/userSlice";
+import { clearUserData } from "../../shared/store/userSlice";
 import { clearMessages } from "../../shared/store/chatSlice";
+import { MdSettings } from "react-icons/md";
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -36,6 +37,21 @@ export default function Navbar() {
     setDropdownOpen(false);
   };
 
+  const handleOpenSettings = async () => {
+    const tabs = await chrome.tabs.query({
+      url: chrome.runtime.getURL("newtab.html"),
+    });
+    if (tabs.length > 0) {
+      await chrome.tabs.update(tabs[0].id, { active: true });
+      await chrome.windows.update(tabs[0].windowId, { focused: true });
+    } else {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL("newtab.html") + "?view=settings",
+      });
+    }
+    window.close();
+  };
+
   return (
     <nav
       className="flex items-center justify-between px-4 py-3 border-b"
@@ -55,63 +71,84 @@ export default function Navbar() {
         </span>
       </div>
 
-      {/* Right — Auth State */}
       {user ? (
-        <div className="relative" ref={dropdownRef}>
-          {/* Avatar Circle */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setDropdownOpen((prev) => !prev)}
-            className="w-8 h-8 rounded-full flex items-center justify-center
-                       font-semibold text-sm transition-opacity hover:opacity-80"
+            onClick={handleOpenSettings}
             style={{
-              backgroundColor: "var(--primary)",
-              color: "var(--text-primary)",
+              background: "transparent",
+              border: "1px solid var(--border)",
+              borderRadius: "8px",
+              width: "30px",
+              height: "30px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              color: "var(--text-secondary)",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "var(--primary)";
+              e.currentTarget.style.color = "var(--primary)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "var(--border)";
+              e.currentTarget.style.color = "var(--text-secondary)";
             }}
           >
-            {getInitial(user.userName)}
+            <MdSettings size={15} />
           </button>
 
-          {/* Dropdown */}
-          {dropdownOpen && (
-            <div
-              className="absolute right-0 mt-2 w-48 rounded-lg border z-50"
+          <div className="relative" ref={dropdownRef}>
+            {/* existing avatar + dropdown — unchanged */}
+            <button
+              onClick={() => setDropdownOpen((prev) => !prev)}
+              className="w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm transition-opacity hover:opacity-80"
               style={{
-                backgroundColor: "var(--bg-elevated)",
-                borderColor: "var(--border)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                backgroundColor: "var(--primary)",
+                color: "var(--text-primary)",
               }}
             >
-              {/* User Info */}
+              {getInitial(user.userName)}
+            </button>
+            {dropdownOpen && (
               <div
-                className="px-4 py-3 border-b"
-                style={{ borderColor: "var(--border)" }}
+                className="absolute right-0 mt-2 w-48 rounded-lg border z-50"
+                style={{
+                  backgroundColor: "var(--bg-elevated)",
+                  borderColor: "var(--border)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                }}
               >
-                <p
-                  className="font-semibold text-sm truncate"
-                  style={{ color: "var(--text-primary)" }}
+                <div
+                  className="px-4 py-3 border-b"
+                  style={{ borderColor: "var(--border)" }}
                 >
-                  {user.userName}
-                </p>
-                <p
-                  className="text-xs truncate mt-0.5"
-                  style={{ color: "var(--text-secondary)" }}
+                  <p
+                    className="font-semibold text-sm truncate"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {user.userName}
+                  </p>
+                  <p
+                    className="text-xs truncate mt-0.5"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    {user.email}
+                  </p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2 px-4 py-3 text-sm transition-colors hover:opacity-80"
+                  style={{ color: "var(--accent-secondary)" }}
                 >
-                  {user.email}
-                </p>
+                  <RiLogoutBoxLine size={15} />
+                  Logout
+                </button>
               </div>
-
-              {/* Logout */}
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-4 py-3
-                           text-sm transition-colors hover:opacity-80"
-                style={{ color: "var(--accent-secondary)" }}
-              >
-                <RiLogoutBoxLine size={15} />
-                Logout
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       ) : null}
     </nav>
