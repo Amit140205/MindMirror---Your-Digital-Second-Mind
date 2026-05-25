@@ -1,37 +1,45 @@
-import { useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
-import { setUserData } from "../shared/store/userSlice.js"
-import { getCurrentUserAPI } from "../shared/api/api.js"
-import Login from "./pages/Login.jsx"
-import Status from "./pages/Status.jsx"
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setUserData } from "../shared/store/userSlice.js";
+import { getCurrentUserAPI, getIgnoredPatternsAPI } from "../shared/api/api.js";
+import Login from "./pages/Login.jsx";
+import Status from "./pages/Status.jsx";
 
 export default function App() {
-  const dispatch = useDispatch()
-  const user = useSelector(state => state.user.userData)
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.userData);
 
   const checkCurrentUser = async () => {
     try {
       // check token exists before calling backend
-      const result = await chrome.storage.local.get("token")
-      if (!result.token) return
+      const result = await chrome.storage.local.get("token");
+      if (!result.token) return;
 
-      const response = await getCurrentUserAPI(result.token)
+      const response = await getCurrentUserAPI(result.token);
       // console.log(response)
-      dispatch(setUserData(response.user))
+      dispatch(setUserData(response.user));
 
+      try {
+        const { ignoredPatterns } = await getIgnoredPatternsAPI(result.token);
+        const local = await chrome.storage.local.get("ignoredPatterns");
+        const localPatterns = local.ignoredPatterns || [];
+        const merged = [...new Set([...ignoredPatterns, ...localPatterns])];
+        await chrome.storage.local.set({ ignoredPatterns: merged });
+      } catch (e) {
+        console.log(
+          "MindMirror: could not sync ignored patterns from backend",
+          e,
+        );
+      }
     } catch (error) {
-      console.log(`User not authenticated: ${error}`)
-      await chrome.storage.local.remove("token")
+      console.log(`User not authenticated: ${error}`);
+      await chrome.storage.local.remove("token");
     }
-  }
+  };
 
   useEffect(() => {
-    checkCurrentUser()
-  }, [])
+    checkCurrentUser();
+  }, []);
 
-  return (
-    <>
-      {user ? <Status /> : <Login />}
-    </>
-  )
+  return <>{user ? <Status /> : <Login />}</>;
 }

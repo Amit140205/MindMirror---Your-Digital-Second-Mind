@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { setUserData } from "../shared/store/userSlice.js"
-import { getCurrentUserAPI } from "../shared/api/api.js"
+import { getCurrentUserAPI, getIgnoredPatternsAPI } from "../shared/api/api.js"
 import ChatPage from "./pages/ChatPage.jsx"
 
 export default function App() {
@@ -20,6 +20,17 @@ export default function App() {
 
       const response = await getCurrentUserAPI(result.token)
       dispatch(setUserData(response.user))
+
+      try {
+        const { ignoredPatterns } = await getIgnoredPatternsAPI(result.token)
+        const local = await chrome.storage.local.get("ignoredPatterns")
+        const localPatterns = local.ignoredPatterns || []
+ 
+        const merged = [...new Set([...ignoredPatterns, ...localPatterns])]
+        await chrome.storage.local.set({ ignoredPatterns: merged })
+      } catch (e) {
+        console.log("MindMirror: could not sync ignored patterns from backend", e)
+      }
 
     } catch (error) {
       console.log(`User not authenticated: ${error}`)

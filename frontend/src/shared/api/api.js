@@ -66,3 +66,20 @@ export const deleteSessionsAPI = async (token) => {
     })
     return response.data
 }
+
+// ignored-patterns - backend node
+export const getIgnoredPatternsAPI = async (token) => {
+  const response = await axiosNodeInstance.get("/api/user/ignored-patterns", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+ 
+export const updateIgnoredPatternsAPI = async (token, patterns) => {
+  const response = await axiosNodeInstance.put(
+    "/api/user/ignored-patterns",
+    { patterns },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+};
