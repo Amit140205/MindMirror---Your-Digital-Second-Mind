@@ -2,8 +2,7 @@ import StorageWarning from "../components/settings/StorageWarning.jsx"
 import ClearHistory from "../components/settings/ClearHistory.jsx"
 import IgnoredPatterns from "../components/settings/IgnoredPatterns.jsx"
 
-export default function SettingsPage({ isVisible }) {
-    if (!isVisible) return null
+export default function SettingsPage() {
 
     return (
         <div

@@ -96,7 +96,7 @@ export default function ChatPage({ initialView = "chat" }) {
             flexDirection: "column",
           }}
         >
-          <SettingsPage isVisible={activeView === "settings"} />
+          <SettingsPage/>
         </div>
       </div>
 

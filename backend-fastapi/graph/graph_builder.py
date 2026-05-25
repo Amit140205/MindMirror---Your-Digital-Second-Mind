@@ -26,7 +26,10 @@ def _build_graph():
     graph.add_node("tools", ToolNode(tools))
     graph.add_node("response_node", response_node)
 
-    graph.add_edge(START, "ignored_check_node")
+    graph.add_conditional_edges(
+        START,
+        lambda state: "ignored_check_node" if state.get("ignoredPatterns") else "prompt_node"
+    )
 
     graph.add_conditional_edges(
         "ignored_check_node",
