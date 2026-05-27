@@ -1,13 +1,13 @@
 import os
 import json
 from langchain_core.tools import tool
-from tavily import TavilyClient
+from tavily import AsyncTavilyClient
 
 
-tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+tavily_client = AsyncTavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 @tool
-def tavily_search(query: str) -> str:
+async def tavily_search(query: str) -> str:
     """
     Search the web for deeper context about a specific page or topic.
     Use ONLY after search_browsing_history has already been called.
@@ -21,7 +21,7 @@ def tavily_search(query: str) -> str:
         JSON string with search results
     """
     try:
-        result = tavily_client.search(
+        result = await tavily_client.search(
             query=query,
             max_results=3,
             include_raw_content=True

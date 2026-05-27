@@ -28,16 +28,33 @@ def _build_graph():
 
     graph.add_conditional_edges(
         START,
-        lambda state: "ignored_check_node" if state.get("ignoredPatterns") else "prompt_node"
+        lambda state: "ignored_check_node" if state.get("ignoredPatterns") else "prompt_node",
+        {
+            "ignored_check_node": "ignored_check_node",
+            "prompt_node": "prompt_node"
+        }
     )
 
     graph.add_conditional_edges(
         "ignored_check_node",
-        lambda state: "response_node" if state.get("is_ignored") else "prompt_node"
+        lambda state: "response_node" if state.get("is_ignored") else "prompt_node",
+        {
+            "response_node": "response_node",
+            "prompt_node": "prompt_node"
+        }
+    )
+
+    graph.add_edge("prompt_node", "chat_node")
+    
+    graph.add_conditional_edges(
+        "chat_node",
+        route_check,
+        {
+            "response_node": "response_node",
+            "tools": "tools"
+        }
     )
     
-    graph.add_edge("prompt_node", "chat_node")
-    graph.add_conditional_edges("chat_node", route_check)
     graph.add_edge("tools", "chat_node")
     graph.add_edge("response_node", END)
 
