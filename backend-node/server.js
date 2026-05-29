@@ -6,6 +6,7 @@ import cors from "cors"
 import { connectDB } from "./utils/connectDB.js"
 import authRouter from "./routes/auth.route.js"
 import userRouter from "./routes/user.route.js"
+import extensionRouter from "./routes/extension.route.js"
 
 
 const app=express()
@@ -21,6 +22,7 @@ app.use(express.json())
 
 app.use("/api/auth", authRouter)
 app.use("/api/user", userRouter)
+app.use("/api/extension", extensionRouter)
 
 app.listen(port, ()=>{
     console.log(`Server running on port ${port}`)

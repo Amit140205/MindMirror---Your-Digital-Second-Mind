@@ -75,6 +75,11 @@ const BREAK_MINUTES = 60; // notify after this many continuous minutes
 const CHECK_INTERVAL = 1; // alarm fires every 1 minute to check elapsed time
 
 async function startBreakTimer() {
+  const existing = await chrome.storage.session.get("breakActiveFrom");
+  if (existing.breakActiveFrom) {
+    console.log("MindMirror: break timer already running, skipping");
+    return;
+  }
   const now = Date.now();
   await chrome.storage.session.set({ breakActiveFrom: now });
   console.log("MindMirror: break timer started");
@@ -107,8 +112,10 @@ async function checkBreakTimer() {
 }
 
 function setupBreakAlarm() {
-  chrome.alarms.create(BREAK_ALARM, {
-    periodInMinutes: CHECK_INTERVAL,
+  chrome.alarms.clear(BREAK_ALARM, () => {
+    chrome.alarms.create(BREAK_ALARM, {
+      periodInMinutes: CHECK_INTERVAL,
+    });
   });
 }
 
@@ -340,6 +347,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 (async () => {
   if (await isAuthenticated()) {
     await maybeShowLoginNotification();
+    await startBreakTimer();
   }
 })();
 

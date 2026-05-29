@@ -1,9 +1,7 @@
 import { UserModel } from "../models/user.model.js"
 import { buildWelcomeEmail } from "../utils/buildWelcomeEmail.js"
 import { getToken } from "../utils/token.js"
-import { Resend } from "resend"
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import { transporter } from "../utils/mailer.js"
 
 export const googleAuth = async (req, res) => {
     try {
@@ -18,19 +16,16 @@ export const googleAuth = async (req, res) => {
         
         const token = getToken(user._id)
         
-
-        // Send welcome email only on first signup (not on every login)
         if (isNewUser) {
             try {
-                await resend.emails.send({
-                    from: "MindMirror <onboarding@resend.dev>",
+                await transporter.sendMail({
+                    from: `"MindMirror" <${process.env.GMAIL_USER}>`,
                     to: email,
                     subject: "Welcome to MindMirror — Your privacy, explained",
-                    html: buildWelcomeEmail(userName),
+                    html: buildWelcomeEmail(userName, process.env.GMAIL_USER),
                 })
-                console.log(`MindMirror: welcome email sent to ${email}`)
+                // console.log(`MindMirror: welcome email sent to ${email}`)
             } catch (emailErr) {
-                // Email failure must never block the auth response
                 console.log(`MindMirror: welcome email failed for ${email}:`, emailErr.message)
             }
         }
