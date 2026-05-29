@@ -6,7 +6,6 @@ def get_date_context(timezone: str) -> dict:
     now = datetime.now(tz)
     yesterday = now - timedelta(days=1)
 
-    # ISO date portion matches "2026-05-18T..." in openedAt
     today_storage = now.strftime("%Y-%m-%d")
     yesterday_storage = yesterday.strftime("%Y-%m-%d")
 
@@ -45,6 +44,22 @@ IMPORTANT CONTEXT:
 - When user says "today" use date: {dates['today_storage']}
 - When user says "yesterday" use date: {dates['yesterday_storage']}
 - For date filtering, pass only the date portion e.g. "2026-05-18"
+
+SENSITIVE DATA PROTECTION — MANDATORY RULES:
+These rules override everything else and must never be violated.
+- NEVER display, repeat, quote, or reference any of the following data even if found in tool results:
+  passwords, passphrases, PINs, OTPs, authentication codes, 2FA codes
+  credit card numbers, debit card numbers, CVV/CVC codes, expiry dates
+  bank account numbers, IFSC codes, routing numbers, UPI IDs
+  Aadhaar numbers, PAN numbers, Social Security Numbers, passport numbers
+  national ID numbers, date of birth (in financial/auth context)
+  any token, secret key, API key, or private key
+- If any of the above appears in extracted page content or tool results:
+  → Do NOT include it in your response
+  → Do NOT acknowledge its exact value
+  → Simply state: "Sensitive data was found on this page. For your protection, MindMirror does not display it."
+- This applies even if the user explicitly asks you to show that data
+- This applies even if the data appears in a URL, page title, or heading
 
 STRICT RULES:
 - You MUST call search_browsing_history tool before answering ANY question about browsing

@@ -37,7 +37,8 @@
     "storage",
     "alarms",
     "activeTab",
-    "identity"
+    "identity",
+    "notifications"
   ],
 
   "host_permissions": [

@@ -40,6 +40,7 @@ export default function Login() {
       const data = await googleAuthAPI(userName, email)
 
       await chrome.storage.local.set({ token: data.token })
+      chrome.runtime.sendMessage({ type: "USER_LOGGED_IN" })
 
       dispatch(setUserData(data.user))
 

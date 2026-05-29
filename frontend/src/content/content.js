@@ -1,7 +1,7 @@
 // CONFIG
 const SCROLL_WAIT_MS = 5000;
 const LONG_SESSION_MS = 5 * 60 * 1000;
-const MIN_BODY_LENGTH = 100; // raised: broad selectors include div/span noise
+const MIN_BODY_LENGTH = 100;
 const MAX_BODY_CHARS = 2000;
 const MAX_HEADINGS = 10;
 
@@ -27,13 +27,94 @@ const JUNK = [
   "notifications",
 ];
 
+// Sensitive field detection
+function hasSensitiveFields() {
+  const inputs = Array.from(document.querySelectorAll("input, select, textarea"));
+
+  // Attribute-based detection (type, name, id, autocomplete, placeholder)
+  const SENSITIVE_TYPES = new Set(["password", "tel"]);
+
+  const SENSITIVE_ATTR_PATTERNS = [
+    // Card & payment
+    /card.?number/i,
+    /card.?no/i,
+    /cvv/i,
+    /cvc/i,
+    /expir/i,
+    /credit.?card/i,
+    /debit.?card/i,
+    /card.?holder/i,
+    /billing/i,
+    /payment/i,
+    /bank.?account/i,
+    /account.?number/i,
+    /routing/i,
+    /ifsc/i,
+    /micr/i,
+    /upi/i,
+    /pin/i,
+    // Credentials
+    /passw/i,
+    /passwd/i,
+    /secret/i,
+    /otp/i,
+    /one.?time/i,
+    /two.?factor/i,
+    /2fa/i,
+    /mfa/i,
+    /verification.?code/i,
+    /auth.?code/i,
+    /token/i,
+    // Identity
+    /ssn/i,
+    /social.?security/i,
+    /aadhar/i,
+    /aadhaar/i,
+    /pan.?number/i,
+    /passport/i,
+    /national.?id/i,
+    /date.?of.?birth/i,
+    /dob/i,
+  ];
+
+  // Autocomplete values that signal sensitive inputs
+  const SENSITIVE_AUTOCOMPLETE = new Set([
+    "cc-number",
+    "cc-csc",
+    "cc-exp",
+    "cc-exp-month",
+    "cc-exp-year",
+    "cc-name",
+    "cc-type",
+    "current-password",
+    "new-password",
+    "one-time-code",
+  ]);
+
+  for (const input of inputs) {
+    const type = (input.type || "").toLowerCase();
+    const name = (input.name || "").toLowerCase();
+    const id = (input.id || "").toLowerCase();
+    const placeholder = (input.placeholder || "").toLowerCase();
+    const autocomplete = (input.getAttribute("autocomplete") || "").toLowerCase();
+    const ariaLabel = (input.getAttribute("aria-label") || "").toLowerCase();
+
+    if (SENSITIVE_TYPES.has(type)) return true;
+    if (SENSITIVE_AUTOCOMPLETE.has(autocomplete)) return true;
+
+    const combined = `${name} ${id} ${placeholder} ${ariaLabel}`;
+    if (SENSITIVE_ATTR_PATTERNS.some((rx) => rx.test(combined))) return true;
+  }
+
+  return false;
+}
+
 // UTIL
+
 function isNoise(text) {
   if (!text || text.length < MIN_BODY_LENGTH) return true;
   const t = text.toLowerCase();
-  // pure numeric — view counts, timestamps, subscriber counts
   if (/^[\d\s,.:\/\-]+$/.test(t)) return true;
-  // script/code fragments
   if (
     t.includes("function(") ||
     t.includes("sml.load") ||
@@ -50,7 +131,6 @@ function extractContent() {
       .filter((h) => h.length > 0)
       .slice(0, MAX_HEADINGS);
 
-    // Step 1: collect all candidate elements with meaningful text
     const candidates = Array.from(document.querySelectorAll(BODY_SELECTOR))
       .map((el) => el.innerText.trim().replace(/\s+/g, " ").replace(/\t/g, ""))
       .filter((text) => !isNoise(text));
@@ -75,9 +155,17 @@ function extractContent() {
 }
 
 // SEND
-// Pure fire-and-forget push. background.js owns all dedup/diff logic.
-// content.js has no state — just scrape and send every time.
+// Checks for sensitive fields before scraping. If found, sends nothing.
 function sendContent(contentType) {
+  // Guard: do not scrape pages that have sensitive input fields
+  if (hasSensitiveFields()) {
+    console.log(
+      "MindMirror: sensitive fields detected — skipping scrape for",
+      location.href,
+    );
+    return;
+  }
+
   const content = extractContent();
 
   if (content.headings.length === 0 && content.body.length === 0) {
@@ -91,7 +179,7 @@ function sendContent(contentType) {
       payload: { url: location.href, contentType, content },
     },
     (response) => {
-      if (chrome.runtime.lastError) return; // tab navigated away — safe to ignore
+      if (chrome.runtime.lastError) return;
       console.log(
         "MindMirror: content sent",
         contentType,
@@ -109,11 +197,8 @@ function startTimers() {
   clearTimeout(scrollTimer);
   clearInterval(intervalTimer);
 
-  // 5s after load — captures content after user's first scroll
   scrollTimer = setTimeout(() => {
     sendContent("update");
-
-    // then every 5min for long sessions — background will diff and discard if same
     intervalTimer = setInterval(() => sendContent("update"), LONG_SESSION_MS);
   }, SCROLL_WAIT_MS);
 }
@@ -126,10 +211,9 @@ function stopTimers() {
 }
 
 // MUTATION OBSERVER (SPA safe)
-// Same pattern as the original working code.
-// Fires when DOM content changes significantly (SPA navigation).
 let mutationObserver = null;
 let mutationTimer = null;
+
 function setupMutationObserver() {
   if (mutationObserver) mutationObserver.disconnect();
 
@@ -137,7 +221,7 @@ function setupMutationObserver() {
     clearTimeout(mutationTimer);
     mutationTimer = setTimeout(() => {
       sendContent("initial");
-    }, 1000); // debounce — fires 1s after DOM stops mutating
+    }, 1000);
   });
 
   mutationObserver.observe(document.body, {
@@ -145,28 +229,24 @@ function setupMutationObserver() {
     subtree: true,
   });
 
-  // safety net — fires after 10s regardless of mutations
-  // ensures slow SPAs and lazy-loaded pages get one final scrape attempt
   setTimeout(() => {
     if (mutationObserver) {
       mutationObserver.disconnect();
       mutationObserver = null;
     }
-    // final attempt — if DOM never had enough content, try once more
     sendContent("initial");
   }, 10000);
 }
 
 // VISIBILITY
+
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") {
-    // final snapshot before tab loses focus — reliable, fires before tab is gone
     stopTimers();
     sendContent("update");
   }
 
   if (document.visibilityState === "visible") {
-    // tab returned to focus — restart timers for continued session
     init();
   }
 });
@@ -176,7 +256,6 @@ function init() {
   stopTimers();
   setupMutationObserver();
   startTimers();
-
   console.log("MindMirror: content extractor ready");
 }
 

@@ -1,11 +1,12 @@
-import express from "express"
 import dotenv from "dotenv"
+dotenv.config()
+
+import express from "express"
 import cors from "cors"
 import { connectDB } from "./utils/connectDB.js"
 import authRouter from "./routes/auth.route.js"
 import userRouter from "./routes/user.route.js"
 
-dotenv.config()
 
 const app=express()
 const port=process.env.PORT || 3000

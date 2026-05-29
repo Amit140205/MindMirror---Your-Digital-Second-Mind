@@ -2,6 +2,7 @@ const QUEUE_KEY = "sessionQueue";
 const BATCH_INTERVAL_MINUTES = 2;
 const MIN_TRACK_TIME = 3000;
 
+// System-level patterns never tracked (privacy, browser internals) 
 const IGNORED_PATTERNS = [
   "chrome://",
   "chrome-extension://",
@@ -10,16 +11,87 @@ const IGNORED_PATTERNS = [
   "brave://",
 ];
 
+// Default privacy-sensitive domains blocked for all users
+// These are blocked by default because they may expose payment details,
+// credentials, health data, or private documents. Users can still see
+// these in their ignored-patterns list and remove them if they wish.
+const DEFAULT_PRIVACY_BLOCKS = [
+  // Payments & banking
+  "paypal.com",
+  "stripe.com",
+  "razorpay.com",
+  "paytm.com",
+  "phonepe.com",
+  "gpay.com",
+  "netbanking",
+  "ibanking",
+  "onlinebanking",
+  "hdfcbank.com",
+  "icicibank.com",
+  "sbi.co.in",
+  "axisbank.com",
+  "kotak.com",
+  "yesbank.in",
+  "rbi.org.in",
+  "bankofamerica.com",
+  "chase.com",
+  "wellsfargo.com",
+  "citibank.com",
+  // Credit cards & finance
+  "americanexpress.com",
+  "visa.com",
+  "mastercard.com",
+  "discover.com",
+  "creditmantri.com",
+  "cibil.com",
+  // Password managers
+  "1password.com",
+  "lastpass.com",
+  "bitwarden.com",
+  "dashlane.com",
+  "keeper.io",
+  "nordpass.com",
+  // Google Workspace (docs, sheets, drive, forms, gmail etc.)
+  "docs.google.com",
+  "sheets.google.com",
+  "drive.google.com",
+  "forms.google.com",
+  "mail.google.com",
+  // Medical & health
+  "practo.com",
+  "1mg.com",
+  "medlineplus.gov",
+  "mayoclinic.org",
+  "webmd.com",
+  // Tax & government portals
+  "incometax.gov.in",
+  "efiling.incometaxindiaefiling.gov.in",
+  "irs.gov",
+  "gov.uk",
+  // Authentication & SSO pages (common paths)
+  "accounts.google.com",
+  "login.microsoftonline.com",
+  "auth0.com",
+  "okta.com",
+];
+
 export async function shouldTrack(url) {
-    if (!url) return false
-    if (IGNORED_PATTERNS.some(pattern => url.startsWith(pattern))) return false
-    if (url === chrome.runtime.getURL("newtab.html")) return false
+  if (!url) return false;
 
-    const result = await chrome.storage.local.get("ignoredPatterns")
-    const userPatterns = result.ignoredPatterns || []
-    if (userPatterns.some(pattern => url.includes(pattern))) return false
+  // Block browser-internal schemes
+  if (IGNORED_PATTERNS.some((pattern) => url.startsWith(pattern))) return false;
+  if (url === chrome.runtime.getURL("newtab.html")) return false;
 
-    return true
+  // Block default privacy-sensitive domains
+  if (DEFAULT_PRIVACY_BLOCKS.some((domain) => url.includes(domain)))
+    return false;
+
+  // Block user-defined ignored patterns (from settings)
+  const result = await chrome.storage.local.get("ignoredPatterns");
+  const userPatterns = result.ignoredPatterns || [];
+  if (userPatterns.some((pattern) => url.includes(pattern))) return false;
+
+  return true;
 }
 
 export function extractDomain(url) {
@@ -67,7 +139,7 @@ export async function setCurrentSession(session) {
   }
 }
 
-// Session Queue (based on tab activity)
+// Session Queue 
 
 export async function startNewSession(tabId, url, title) {
   const current = await getCurrentSession();
@@ -81,7 +153,6 @@ export async function startNewSession(tabId, url, title) {
     startTime: Date.now(),
     openedAt: getISOTime(),
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    // CHANGED: structured format instead of old "[]"
     extractedText: extractedText || JSON.stringify({ initial: "", updates: [] }),
   });
 }
@@ -108,8 +179,9 @@ export async function endCurrentSession() {
       openedAt: current.openedAt,
       closedAt: getISOTime(),
       timeZone: current.timeZone,
-      // CHANGED: structured format fallback instead of old "[]"
-      extractedText: current.extractedText || JSON.stringify({ initial: "", updates: [] }),
+      extractedText:
+        current.extractedText ||
+        JSON.stringify({ initial: "", updates: [] }),
     });
   } finally {
     isEndingSession = false;
@@ -117,7 +189,6 @@ export async function endCurrentSession() {
 }
 
 export async function queueSession(session) {
-  // ignore very short visits
   if (session.timeSpent < MIN_TRACK_TIME) {
     console.log("MindMirror: session too short, ignored", session.url);
     return;
@@ -152,7 +223,6 @@ export async function batchFlush() {
   }
 
   console.log(`MindMirror: batch flush → ${queue.length} sessions`);
-  console.log("MindMirror: sessions data →", JSON.stringify(queue, null, 2));
 
   try {
     const BACKEND_URL = "http://localhost:3000";

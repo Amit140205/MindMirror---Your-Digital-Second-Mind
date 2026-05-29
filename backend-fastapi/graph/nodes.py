@@ -9,7 +9,7 @@ from graph.tools.search_tool import search_browsing_history
 from graph.tools.tavily_tool import tavily_search
 
 
-# Output schema
+# Output schema 
 class Source(BaseModel):
     url: Annotated[str, Field(description="Full URL of the visited webpage")]
     title: Annotated[str, Field(description="Page title captured from browser tab")]
@@ -27,8 +27,7 @@ class MindMirrorResponse(BaseModel):
 class IgnoredCheckResponse(BaseModel):
     is_ignored: bool
 
-# Models+Tools
-
+# Models + Tools
 tools = [search_browsing_history, tavily_search]
 
 model = ChatOpenAI(model="gpt-4o-mini")
@@ -36,7 +35,6 @@ model_with_tools = model.bind_tools(tools)
 model_structured = model.with_structured_output(MindMirrorResponse)
 
 # Nodes
-
 async def ignored_check_node(state: ChatState) -> dict:
     ignored_patterns = state.get("ignoredPatterns", [])
 
@@ -78,13 +76,14 @@ def prompt_node(state: ChatState) -> dict:
     )
     return { "prompt": prompt }
 
+
 async def chat_node(state: ChatState) -> dict:
     system_prompt = state["prompt"]
     messages = state["messages"]
     last_message = messages[-1]
 
-    # if last message is tool result with real data
-    # skip LLM call, pass directly to response_node
+    # If last message is a tool result with real data,
+    # skip LLM call and pass directly to response_node
     if isinstance(last_message, ToolMessage):
         tool_content = last_message.content
         if "No sessions found" not in tool_content and "error" not in tool_content:
@@ -122,6 +121,22 @@ Rules:
 - suggestions: if the user seems to want to revisit or explore further,
   provide 2-3 actual URLs from the tool results worth reopening.
   Otherwise leave null. Never fabricate URLs not present in tool results.
+
+SENSITIVE DATA PROTECTION — MANDATORY:
+These rules are absolute and override everything else.
+- NEVER include any of the following in the answer field, even if present in tool results:
+  passwords, PINs, OTPs, 2FA codes, authentication tokens
+  credit/debit card numbers, CVV, expiry dates, card holder names in payment context
+  bank account numbers, IFSC/routing numbers, UPI IDs
+  Aadhaar, PAN, SSN, passport numbers, national IDs
+  any API key, secret key, or private credential
+- If such data was detected in the browsing session content:
+  → Do NOT reproduce it in any field (answer, sources, suggestions)
+  → In the answer field, include exactly this sentence where relevant:
+    "Sensitive data was found on this page. For your protection, MindMirror does not display it."
+  → Continue with any safe, non-sensitive summary of the page if one exists
+- This applies even if the user explicitly requested that data
+- URLs in sources are safe to include; only the content/extracted-text is masked
 """)
 
     full_messages = [structured_system] + messages
@@ -130,7 +145,7 @@ Rules:
     return { "messages": [AIMessage(content=response.model_dump_json())] }
 
 
-# route check
+# Route check 
 def route_check(state: ChatState) -> Literal["response_node", "tools"]:
     messages = state["messages"]
     last_message = messages[-1]
@@ -139,4 +154,3 @@ def route_check(state: ChatState) -> Literal["response_node", "tools"]:
         return "tools"
 
     return "response_node"
-
