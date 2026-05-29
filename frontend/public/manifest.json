@@ -43,8 +43,7 @@
 
   "host_permissions": [
     "http://localhost:3000/*",
-    "http://localhost:8000/*",
-    "https://your-node-backend.railway.app/*"
+    "http://localhost:8000/*"
   ],
 
   "web_accessible_resources": [

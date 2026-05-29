@@ -52,7 +52,7 @@ function hasSensitiveFields() {
     /ifsc/i,
     /micr/i,
     /upi/i,
-    /pin/i,
+    /\bpin\b/i,
     // Credentials
     /passw/i,
     /passwd/i,
