@@ -12,9 +12,6 @@ const IGNORED_PATTERNS = [
 ];
 
 // Default privacy-sensitive domains blocked for all users
-// These are blocked by default because they may expose payment details,
-// credentials, health data, or private documents. Users can still see
-// these in their ignored-patterns list and remove them if they wish.
 const DEFAULT_PRIVACY_BLOCKS = [
   // Payments & banking
   "paypal.com",
@@ -67,7 +64,7 @@ const DEFAULT_PRIVACY_BLOCKS = [
   "incometax.gov.in",
   "efiling.incometaxindiaefiling.gov.in",
   "irs.gov",
-  "gov.uk",
+  "gov.in",
   // Authentication & SSO pages (common paths)
   "accounts.google.com",
   "login.microsoftonline.com",
