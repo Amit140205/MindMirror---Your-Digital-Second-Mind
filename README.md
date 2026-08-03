@@ -3,7 +3,7 @@
   <img src="./assets/banner.png" alt="MindMirror — Your Digital Second Mind" width="100%" />
 </p>
 
-<h1 align="center">🪞 MindMirror</h1>
+<h1 align="center">MindMirror</h1>
 <p align="center"><b>Your Digital Second Mind</b></p>
 <p align="center">A privacy-first Chrome extension that turns your browsing history into a conversational, searchable memory.</p>
 
@@ -185,13 +185,6 @@ Then load it into Chrome:
 - Browsing session content is **encrypted at rest** with AES-256-GCM, using a key derived per user via HMAC-SHA256 — the same derivation logic is shared between the Node and FastAPI services so either can decrypt only what belongs to that user.
 - Users can mark specific domains as **ignored**; the agent checks this list before answering and will decline to discuss those domains.
 - The AI response layer actively **redacts sensitive data** (passwords, OTPs, card numbers, government IDs, API keys) even if such data was inadvertently captured in page text.
-
-## Roadmap
-
-- [ ] Multi-device sync
-- [ ] Local-only / on-device mode
-- [ ] Export browsing insights as reports
-- [ ] More granular retention controls
 
 ## Author
 
